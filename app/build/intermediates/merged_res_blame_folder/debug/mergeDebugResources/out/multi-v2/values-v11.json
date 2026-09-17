@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.nuwa.scenarioplayer.app-mergeDebugResources-42:/values-v11/values-v11.xml",
+            "map": [
+                {
+                    "source": "/Users/luoshiheng/.gradle/caches/9.3.1/transforms/e359ca382542edb0971f38252c849713/transformed/NuwaSDK-2021-07-08_1058_2.1.0.08_e21fe7/res/values-v11/values-v11.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "4",
+                        "endColumns": "12",
+                        "endOffsets": "187"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "4",
+                        "endColumns": "12",
+                        "endOffsets": "138"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+com.nuwa.scenarioplayer.app-pngs-0 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/build/generated/res/pngs/debug
+com.nuwa.scenarioplayer.app-updated_navigation_xml-1 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/build/generated/updated_navigation_xml/debug
+com.nuwa.scenarioplayer.app-packageDebugResources-2 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.nuwa.scenarioplayer.app-packageDebugResources-3 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.nuwa.scenarioplayer.app-debug-4 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.nuwa.scenarioplayer.app-debug-5 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/src/debug/res
+com.nuwa.scenarioplayer.app-main-6 /Users/luoshiheng/AndroidStudioProjects/KebbiScenarioPlayer/app/src/main/res

@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.nuwa.scenarioplayer.app-mergeDebugResources-42:/values-ldltr-v21/values-ldltr-v21.xml",
+            "map": [
+                {
+                    "source": "/Users/luoshiheng/.gradle/caches/9.3.1/transforms/6fdfce81faa8f3377ffcc89d0867bec4/transformed/appcompat-1.6.1/res/values-ldltr-v21/values-ldltr-v21.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "112",
+                        "endOffsets": "163"
+                    }
+                }
+            ]
+        }
+    ]
+}
