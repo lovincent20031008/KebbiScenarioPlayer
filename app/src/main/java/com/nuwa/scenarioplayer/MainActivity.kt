@@ -1,14 +1,18 @@
 package com.nuwa.scenarioplayer
 
+import android.content.ComponentName
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.nuwa.scenarioplayer.audio.SoundEffectManager
 import com.nuwa.scenarioplayer.engine.ChassisSafetyManager
 import com.nuwa.scenarioplayer.engine.LedManager
 import com.nuwa.scenarioplayer.engine.ScenarioEngine
@@ -35,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var chassisManager: ChassisSafetyManager
     private lateinit var ledManager: LedManager
+    private lateinit var soundManager: SoundEffectManager
     private lateinit var engine: ScenarioEngine
     private var httpServer: ScenarioHttpServer? = null
 
@@ -43,7 +48,9 @@ class MainActivity : AppCompatActivity() {
     // UI 元件
     private lateinit var tvHeaderStatus: TextView
     private lateinit var tvActiveStatus: TextView
+    private lateinit var cbAutoFace: CheckBox
     private lateinit var btnEmergencyStop: Button
+    private lateinit var btnMegaDemo: Button
     private lateinit var containerButlerCards: LinearLayout
     private lateinit var containerFraudCards: LinearLayout
 
@@ -53,7 +60,10 @@ class MainActivity : AppCompatActivity() {
 
         tvHeaderStatus = findViewById(R.id.tv_header_status)
         tvActiveStatus = findViewById(R.id.tv_active_status)
+        cbAutoFace = findViewById(R.id.cb_auto_face)
         btnEmergencyStop = findViewById(R.id.btn_emergency_stop)
+        btnMegaDemo = findViewById(R.id.btn_mega_demo)
+        val btnMegaDemoBanner: Button = findViewById(R.id.btn_mega_demo_banner)
         containerButlerCards = findViewById(R.id.container_butler_cards)
         containerFraudCards = findViewById(R.id.container_fraud_cards)
 
@@ -65,6 +75,16 @@ class MainActivity : AppCompatActivity() {
         btnEmergencyStop.setOnClickListener {
             engine.stop()
         }
+
+        val onMegaDemoClick = {
+            if (!engine.isPlaying) {
+                engine.play(ScenarioRepository.megaDemoScenario)
+            } else {
+                engine.stop()
+            }
+        }
+        btnMegaDemo.setOnClickListener { onMegaDemoClick() }
+        btnMegaDemoBanner.setOnClickListener { onMegaDemoClick() }
     }
 
     private fun initRobotSdk() {
@@ -127,7 +147,13 @@ class MainActivity : AppCompatActivity() {
             override fun onGetCameraPose(p0: Float, p1: Float, p2: Float, p3: Float, p4: Float, p5: Float, p6: Float, p7: Float, p8: Float, p9: Float, p10: Float, p11: Float) {}
             override fun onTouchEvent(p0: Int, p1: Int) {}
             override fun onPIREvent(p0: Int) {}
-            override fun onTap(p0: Int) {}
+            override fun onTap(p0: Int) {
+                Log.d(TAG, "onTap detected: $p0")
+                if (engine.isPlaying) {
+                    Log.i(TAG, "Emergency Stop triggered via robot tap sensor")
+                    engine.stop()
+                }
+            }
             override fun onLongPress(p0: Int) {}
             override fun onWindowSurfaceReady() {}
             override fun onWindowSurfaceDestroy() {}
@@ -149,11 +175,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupEngine() {
         chassisManager = ChassisSafetyManager(robot) { true }
         ledManager = LedManager(robot) { true }
+        soundManager = SoundEffectManager(this)
 
         engine = ScenarioEngine(
             robot = robot,
             chassisManager = chassisManager,
             ledManager = ledManager,
+            soundManager = soundManager,
             isMotorEnabled = { true },
             isTtsEnabled = { true },
             listener = object : ScenarioEngine.ScenarioEngineListener {
@@ -161,6 +189,9 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         tvActiveStatus.text = "▶ 正在播放：${scenario.title} (${scenario.badge})"
                         tvActiveStatus.setTextColor(Color.parseColor("#1565C0"))
+                        if (cbAutoFace.isChecked) {
+                            showFacePresenter()
+                        }
                     }
                 }
 
@@ -174,6 +205,9 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         tvActiveStatus.text = "✓ 劇本完成：${scenario.title} (動作與燈效已復原)"
                         tvActiveStatus.setTextColor(Color.parseColor("#2E7D32"))
+                        if (cbAutoFace.isChecked) {
+                            bringAppToFront()
+                        }
                     }
                 }
 
@@ -181,6 +215,9 @@ class MainActivity : AppCompatActivity() {
                     runOnUiThread {
                         tvActiveStatus.text = "■ 已緊急中斷 (E-STOP)：${scenario?.title ?: "未知劇本"}"
                         tvActiveStatus.setTextColor(Color.parseColor("#C62828"))
+                        if (cbAutoFace.isChecked) {
+                            bringAppToFront()
+                        }
                     }
                 }
 
@@ -192,6 +229,31 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+    }
+
+    private fun showFacePresenter() {
+        try {
+            val intent = Intent().apply {
+                component = ComponentName("com.nuwarobotics.app.facepresenter", "com.nuwarobotics.app.facepresenter.FaceActivity")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+            Log.i(TAG, "Switched to FaceActivity successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to launch FaceActivity", e)
+        }
+    }
+
+    private fun bringAppToFront() {
+        try {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(intent)
+            Log.i(TAG, "Brought MainActivity back to front")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to bring MainActivity to front", e)
+        }
     }
 
     private fun setupCardViews() {
@@ -239,7 +301,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        engine.stop()
+        if (::engine.isInitialized) {
+            engine.stop()
+        }
+        if (::soundManager.isInitialized) {
+            soundManager.release()
+        }
         httpServer?.stop()
     }
 }

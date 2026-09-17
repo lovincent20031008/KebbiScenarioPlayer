@@ -18,9 +18,9 @@ class ChassisSafetyManager(
     companion object {
         private const val TAG = "ChassisSafetyManager"
 
-        // 硬體防衝安全上限 (適度提升以展現高動態與衝刺感，維持 25cm 上限)
-        const val MAX_MOVE_SPEED = 0.28f      // 最大直線速度 0.28 m/s
-        const val MAX_TURN_SPEED = 130.0f     // 最大旋轉速度 130 deg/s
+        // 1.5倍速極限動態安全上限 (衝刺感、疾速自轉、維持安全位移區間)
+        const val MAX_MOVE_SPEED = 0.32f      // 最大直線速度 0.32 m/s (原 0.22 的 1.5 倍)
+        const val MAX_TURN_SPEED = 150.0f     // 最大旋轉速度 150 deg/s (原 100 的 1.5 倍)
         const val MAX_DURATION_MS = 2500L     // 單次最長位移時長 2.5 秒
     }
 

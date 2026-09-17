@@ -87,11 +87,26 @@ class ScenarioHttpServer(
                     newFixedLengthResponse(Response.Status.OK, "application/json", json)
                 }
 
-                "/scenario/stop" -> {
+                "/scenario/stop", "/demo/stop" -> {
                     engine.stop()
                     val json = JSONObject().apply {
                         put("ok", true)
                         put("stopped", true)
+                    }.toString()
+                    newFixedLengthResponse(Response.Status.OK, "application/json", json)
+                }
+
+                "/demo/start", "/demo" -> {
+                    val demo = ScenarioRepository.megaDemoScenario
+                    val success = engine.play(demo)
+                    val json = JSONObject().apply {
+                        put("ok", success)
+                        put("scenarioId", demo.id)
+                        put("scenarioTitle", demo.title)
+                        put("durationEst", "60s")
+                        if (!success) {
+                            put("reason", "Another scenario is currently playing or motors unavailable")
+                        }
                     }.toString()
                     newFixedLengthResponse(Response.Status.OK, "application/json", json)
                 }

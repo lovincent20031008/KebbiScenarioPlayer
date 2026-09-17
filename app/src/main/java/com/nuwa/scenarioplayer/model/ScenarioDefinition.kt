@@ -1,5 +1,7 @@
 package com.nuwa.scenarioplayer.model
 
+import com.nuwa.scenarioplayer.audio.SoundType
+
 enum class ScenarioCategory {
     BUTLER,
     FRAUD_ALERT
@@ -20,9 +22,9 @@ enum class LedPattern {
 }
 
 data class ChassisMove(
-    val speed: Float = 0f,          // m/s (正為前進，負為後退，安全上限 0.28 m/s)
+    val speed: Float = 0f,          // m/s (正為前進，負為後退，安全上限 0.32 m/s)
     val durationMs: Long = 0L,      // 移動時長 (ms，安全上限 2500 ms)
-    val turnSpeed: Float = 0f       // deg/s (正為順時針，負為逆時針，安全上限 130 deg/s)
+    val turnSpeed: Float = 0f       // deg/s (正為順時針，負為逆時針，安全上限 150 deg/s)
 )
 
 data class ScenarioStep(
@@ -30,6 +32,7 @@ data class ScenarioStep(
     val motionName: String? = null,
     val chassisMove: ChassisMove? = null,
     val ledPattern: LedPattern = LedPattern.OFF,
+    val soundType: SoundType? = null,
     val ttsText: String? = null,
     val ttsSpeed: String = "100",
     val ttsPitch: String = "100",

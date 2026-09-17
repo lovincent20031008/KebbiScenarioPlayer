@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import com.nuwarobotics.service.agent.NuwaRobotAPI
 import com.nuwarobotics.service.agent.VoiceEventListener
+import com.nuwa.scenarioplayer.audio.SoundEffectManager
 import com.nuwa.scenarioplayer.model.Scenario
 import com.nuwa.scenarioplayer.model.ScenarioStep
 
@@ -12,6 +13,7 @@ class ScenarioEngine(
     private val robot: NuwaRobotAPI,
     val chassisManager: ChassisSafetyManager,
     val ledManager: LedManager,
+    val soundManager: SoundEffectManager? = null,
     private val isMotorEnabled: () -> Boolean,
     private val isTtsEnabled: () -> Boolean,
     private val listener: ScenarioEngineListener? = null
@@ -112,6 +114,16 @@ class ScenarioEngine(
         // 4. 燈效復原
         ledManager.reset()
 
+        // 5. 音效停止
+        soundManager?.stopAll()
+
+        // 6. 官方臉部視窗隱藏
+        try {
+            robot.hideWindow(true)
+        } catch (e: Exception) {
+            Log.e(TAG, "hideWindow failed", e)
+        }
+
         listener?.onScenarioStopped(stoppedScenario)
     }
 
@@ -130,7 +142,12 @@ class ScenarioEngine(
         // 1. 套用燈效
         ledManager.applyPattern(step.ledPattern)
 
-        // 2. 觸發語音 TTS
+        // 2. 觸發特殊音效
+        step.soundType?.let { sound ->
+            soundManager?.play(sound)
+        }
+
+        // 3. 觸發語音 TTS
         step.ttsText?.let { text ->
             if (isTtsEnabled()) {
                 try {
@@ -144,23 +161,23 @@ class ScenarioEngine(
             }
         }
 
-        // 3. 觸發底盤移動
+        // 4. 觸發底盤移動
         step.chassisMove?.let { move ->
             chassisManager.execute(move)
         }
 
-        // 4. 觸發官方肢體動作
+        // 5. 觸發官方肢體動作與全螢幕臉部表情視窗 (auto_fadein = true)
         step.motionName?.let { motion ->
             if (isMotorEnabled()) {
                 try {
-                    robot.motionPlay(motion, false)
+                    robot.motionPlay(motion, true)
                 } catch (e: Exception) {
                     Log.e(TAG, "motionPlay failed on motion: $motion", e)
                 }
             }
         }
 
-        // 5. 設定看門狗定時器 (若動作無回調或超時，自動跳入下一步)
+        // 6. 設定看門狗定時器 (若動作無回調或超時，自動跳入下一步)
         setWatchdog(step.timeoutMs) {
             Log.w(TAG, "Step timeout reached for: ${step.name}, advancing...")
             executeStep(index + 1)
@@ -174,6 +191,13 @@ class ScenarioEngine(
         cancelWatchdog()
         chassisManager.emergencyStop()
         ledManager.reset()
+        soundManager?.stopAll()
+
+        try {
+            robot.hideWindow(true)
+        } catch (e: Exception) {
+            Log.e(TAG, "hideWindow failed on finish", e)
+        }
 
         isPlaying = false
         currentStepIndex = -1

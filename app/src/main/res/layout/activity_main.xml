@@ -37,6 +37,28 @@
                 android:textColor="#757575" />
         </LinearLayout>
 
+        <CheckBox
+            android:id="@+id/cb_auto_face"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="🎭 顯示3D表情臉"
+            android:checked="true"
+            android:textColor="#37474F"
+            android:textStyle="bold"
+            android:layout_marginEnd="10dp" />
+
+        <Button
+            android:id="@+id/btn_mega_demo"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="✨ 60秒極限聯播 (MEGA DEMO)"
+            android:backgroundTint="#FF6F00"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginEnd="10dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
         <Button
             android:id="@+id/btn_emergency_stop"
             android:layout_width="wrap_content"
@@ -79,7 +101,71 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+
+            <!-- 🌟 VIP 60秒全場景旗艦主打卡片 (全幅醒目推薦) -->
+            <LinearLayout
+                android:id="@+id/card_mega_demo_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFF8E1"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🌟 【旗艦主打】60秒極限全場景聯播 (MEGA DEMO)"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#E65100" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔥 奧特曼・格鬥・拔刀・蜂鳴號角音效・12幕全開"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#BF360C"
+                        android:background="#FFE082"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="12 幕高潮連續技：號角迎賓(Ta-Da) ➔ 90°深鞠躬 ➔ 奧特曼光能引領 ➔ 帝王盛大鼓掌 ➔ 超人飛天 ➔ 空襲蜂鳴急煞 ➔ 猛撲雙拳格鬥卡位 ➔ 抱頭慘叫絕望急退(NOOO) ➔ 雙手交叉駁斥 ➔ 狂搖頭 ➔ 拔刀斬斷180°大自轉 ➔ 側身帥氣謝幕"
+                    android:textSize="13sp"
+                    android:textColor="#5D4037"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/btn_mega_demo_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="▶ 立即一鍵啟動 60 秒極限聯播 (MEGA DEMO)"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:backgroundTint="#FF6F00"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
             <!-- 左欄：管家模式 (5 套) -->
             <LinearLayout
@@ -136,6 +222,7 @@
             </LinearLayout>
 
         </LinearLayout>
+    </LinearLayout>
     </ScrollView>
 
 </LinearLayout>
