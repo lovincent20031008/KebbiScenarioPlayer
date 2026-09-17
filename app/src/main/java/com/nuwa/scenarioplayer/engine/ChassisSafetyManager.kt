@@ -18,10 +18,10 @@ class ChassisSafetyManager(
     companion object {
         private const val TAG = "ChassisSafetyManager"
 
-        // 硬體防衝安全上限
-        const val MAX_MOVE_SPEED = 0.15f      // 最大直線速度 0.15 m/s
-        const val MAX_TURN_SPEED = 60.0f      // 最大旋轉速度 60 deg/s
-        const val MAX_DURATION_MS = 2500L     // 單次最長位移時長 2.5 秒 (最遠約 25cm)
+        // 硬體防衝安全上限 (適度提升以展現高動態與衝刺感，維持 25cm 上限)
+        const val MAX_MOVE_SPEED = 0.28f      // 最大直線速度 0.28 m/s
+        const val MAX_TURN_SPEED = 130.0f     // 最大旋轉速度 130 deg/s
+        const val MAX_DURATION_MS = 2500L     // 單次最長位移時長 2.5 秒
     }
 
     private val mainHandler = Handler(Looper.getMainLooper())

@@ -20,9 +20,9 @@ enum class LedPattern {
 }
 
 data class ChassisMove(
-    val speed: Float = 0f,          // m/s (正為前進，負為後退，安全上限 0.15 m/s)
-    val durationMs: Long = 0L,      // 移動時長 (ms，安全上限 2000 ms)
-    val turnSpeed: Float = 0f       // deg/s (正為順時針，負為逆時針，安全上限 60 deg/s)
+    val speed: Float = 0f,          // m/s (正為前進，負為後退，安全上限 0.28 m/s)
+    val durationMs: Long = 0L,      // 移動時長 (ms，安全上限 2500 ms)
+    val turnSpeed: Float = 0f       // deg/s (正為順時針，負為逆時針，安全上限 130 deg/s)
 )
 
 data class ScenarioStep(
