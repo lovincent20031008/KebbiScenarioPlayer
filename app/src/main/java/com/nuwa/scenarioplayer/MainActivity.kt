@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "ScenarioPlayerMain"
         private const val HTTP_PORT = 8081
+        var instance: MainActivity? = null
+            private set
     }
 
     private lateinit var robot: NuwaRobotAPI
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        instance = this
         setContentView(R.layout.activity_main)
 
         tvHeaderStatus = findViewById(R.id.tv_header_status)
@@ -299,8 +302,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun playScenarioById(id: String): Boolean {
+        val scenario = ScenarioRepository.findById(id) ?: return false
+        return engine.play(scenario)
+    }
+
+    fun stopScenario() {
+        engine.stop()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent?.getStringExtra("scenario_id")?.let { id ->
+            playScenarioById(id)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        if (instance === this) {
+            instance = null
+        }
         if (::engine.isInitialized) {
             engine.stop()
         }

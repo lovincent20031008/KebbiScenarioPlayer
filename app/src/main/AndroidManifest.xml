@@ -21,6 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".receiver.ScenarioAlertReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.nuwa.scenarioplayer.TRIGGER_ALERT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
