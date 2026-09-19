@@ -45,7 +45,7 @@
 
 ---
 
-## 🌟 核心技術亮點 (Key Features)
+## 🌟 技術亮點 (Key Features)
 
 ### 1. 五維度多模態時序同步排程 (Multi-Modal Synchronization)
 - 原生女媧 SDK 的致動器（馬達、底盤、語音、臉部、LED）彼此獨立破碎。本引擎透過協同時間軸（Coordinated Timeline）實現毫秒級精準同步：
@@ -68,7 +68,7 @@
 
 ## 🎭 劇本庫與 60 秒旗艦聯播 (Scenario Catalog)
 
-### 🌟 旗艦主打：60 秒極限全場景聯播 (MEGA DEMO)
+### 🌟 60 秒全場景聯播 (MEGA DEMO)
 串聯 12 幕高潮連續技，展示全機極限動態性能：
 $$\text{Ta-Da迎賓號角} \rightarrow \text{90}^\circ\text{深鞠躬} \rightarrow \text{奧特曼光能} \rightarrow \text{帝王鼓掌} \rightarrow \text{超人飛天} \rightarrow \text{空襲急煞} \rightarrow \text{雙拳格鬥卡位} \rightarrow \text{抱頭NOOO急退} \rightarrow \text{交叉駁斥} \rightarrow \text{狂搖頭} \rightarrow \text{拔刀180}^\circ\text{大自轉} \rightarrow \text{側身謝幕}$$
 
