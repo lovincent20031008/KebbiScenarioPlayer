@@ -45,6 +45,21 @@
         android:text="劇本動作詳細說明"
         android:textSize="12sp"
         android:textColor="#616161"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tv_card_theory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📚 論文理論依據"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#0D47A1"
+        android:background="#E3F2FD"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         android:layout_marginBottom="8dp" />
 
     <Button

@@ -268,11 +268,19 @@ class MainActivity : AppCompatActivity() {
             val tvTitle = cardView.findViewById<TextView>(R.id.tv_card_title)
             val tvBadge = cardView.findViewById<TextView>(R.id.tv_card_badge)
             val tvDesc = cardView.findViewById<TextView>(R.id.tv_card_desc)
+            val tvTheory = cardView.findViewById<TextView>(R.id.tv_card_theory)
             val btnPlay = cardView.findViewById<Button>(R.id.btn_card_play)
 
             tvTitle.text = scenario.title
             tvBadge.text = scenario.badge
             tvDesc.text = scenario.description
+
+            if (scenario.theoryPaper.isNotEmpty()) {
+                tvTheory.visibility = View.VISIBLE
+                tvTheory.text = "📚 ${scenario.theoryPaper} (${scenario.affectiveState})"
+            } else {
+                tvTheory.visibility = View.GONE
+            }
 
             if (scenario.category == ScenarioCategory.BUTLER) {
                 btnPlay.backgroundTintList = getColorStateList(android.R.color.holo_blue_dark)

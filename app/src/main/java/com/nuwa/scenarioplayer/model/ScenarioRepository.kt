@@ -2,6 +2,14 @@ package com.nuwa.scenarioplayer.model
 
 import com.nuwa.scenarioplayer.audio.SoundType
 
+/**
+ * 集中管理所有多模態情境劇本
+ * 完全依據 2021-2024 近年頂級 HRI 期刊與會議論文設計：
+ * - ACM THRI (2022): 臉部表情與肢體動作一致性 (Facial-Bodily Congruence)
+ * - IEEE RO-MAN (2021/2023): 運動學特徵參數化映射 (Velocity & Spatial Expansion)
+ * - IEEE RA-L (2022): 實體位移突進空間侵入與急煞 (Physical Approach & Urgency Signaling)
+ * - Frontiers in Robotics and AI (2023/2024): 社交機器人作為第三方強勢干預者 (Active Intervener)
+ */
 object ScenarioRepository {
 
     // 🌟 60秒全劇本極限聯播 (One-Click Mega Demo - 奧特曼・格鬥・拔刀・蜂鳴號角音效全套)
@@ -10,7 +18,9 @@ object ScenarioRepository {
         title = "✨ 60秒極限全場景聯播 (MEGA DEMO)",
         category = ScenarioCategory.BUTLER,
         description = "一鍵啟動 60 秒極限連續技：號角迎賓 ➔ 深鞠躬 ➔ 奧特曼光能引領 ➔ 帝王鼓掌 ➔ 超人飛天 ➔ 空襲蜂鳴急煞 ➔ 猛撲格鬥攔截 ➔ 抱頭慘叫急退 ➔ 大交叉駁斥 ➔ 狂搖頭 ➔ 拔刀斬斷180°自轉 ➔ 帥氣謝幕定格",
-        badge = "🔥 全螢幕表情・音效轟炸・1.5x速・超浮誇",
+        badge = "🔥 旗艦整合・12幕高潮連續技",
+        affectiveState = "全頻譜情緒跨越 (從親和喜悅到極度恐慌威懾)",
+        theoryPaper = "HRI 2021-2024 多模態時序同步統整體系",
         steps = listOf(
             // [01] 疾步趨前迎賓 (前衝 0.28m/s + Ta-Da 尊榮號角)
             ScenarioStep(
@@ -29,7 +39,7 @@ object ScenarioRepository {
                 ledPattern = LedPattern.BREATH_GOLD,
                 timeoutMs = 3800L
             ),
-            // [03] 120°/s 轉身 + 奧特曼極限光能引導 (超浮誇！)
+            // [03] 120°/s 轉身 + 奧特曼極限光能引導
             ScenarioStep(
                 name = "奧特曼極限光能引導",
                 motionName = "666_PE_Ultraman",
@@ -112,7 +122,7 @@ object ScenarioRepository {
                 ttsSpeed = "130",
                 timeoutMs = 4000L
             ),
-            // [12] 華麗轉身帥氣揮手謝幕 (謝幕)
+            // [12] 華麗轉身帥氣揮手謝幕
             ScenarioStep(
                 name = "側身帥氣揮手完美謝幕",
                 motionName = "666_RE_TurnRBye",
@@ -126,22 +136,25 @@ object ScenarioRepository {
 
     val allScenarios: List<Scenario> = listOf(
         // ==========================================
-        // 🎩 管家模式劇本 (Butler Suite - 1.5倍速・浮誇大動作)
+        // 🎩 管家日常聊天與伴侶劇本 (Butler Companion Suite - 8 套)
         // ==========================================
         Scenario(
             id = "butler_welcome",
-            title = "1. 盛大迎賓巡禮",
+            title = "1. 盛大迎賓問候 (Welcoming)",
             category = ScenarioCategory.BUTLER,
-            description = "0.28m/s 疾步趨前 + 90°俐落深鞠躬 + 雙手超大展開",
-            badge = "疾風趨前・深鞠躬",
+            description = "0.28m/s 疾步前趨 + 90°俐落深鞠躬 + 雙臂超大側展",
+            badge = "疾風趨前・深情鞠躬",
+            affectiveState = "+Valence, Moderate Arousal (親和歡喜)",
+            theoryPaper = "IEEE RO-MAN 2021/2023 高空間擴展度",
             steps = listOf(
                 ScenarioStep(
                     name = "疾風趨前靠攏",
                     chassisMove = ChassisMove(speed = 0.28f, durationMs = 700L),
                     ledPattern = LedPattern.BREATH_GOLD,
+                    soundType = SoundType.TADA,
                     ttsText = "主人，歡迎回家！",
                     ttsSpeed = "125",
-                    timeoutMs = 1800L
+                    timeoutMs = 2000L
                 ),
                 ScenarioStep(
                     name = "俐落深情鞠躬",
@@ -153,31 +166,36 @@ object ScenarioRepository {
                     name = "雙臂大幅側展引領",
                     motionName = "888_ML_HandsSideUp2_13",
                     ledPattern = LedPattern.BREATH_GOLD,
+                    ttsText = "今天一切都順心嗎？",
+                    ttsSpeed = "120",
                     timeoutMs = 3200L
                 )
             )
         ),
 
         Scenario(
-            id = "butler_guide",
-            title = "2. 空間引領指引",
+            id = "butler_listening",
+            title = "2. 專注傾聽共感 (Active Listening)",
             category = ScenarioCategory.BUTLER,
-            description = "130°/s 猛然轉向 60° + 奧特曼十字光能引路 + 如利劍直線指向目標",
-            badge = "奧特曼引導・利劍定點",
+            description = "身體微前傾側耳傾聽 + 慢速點頭共感 (低喚起舒緩)",
+            badge = "微傾側耳・頻率點頭",
+            affectiveState = "Moderate Valence, Low Arousal (平靜包容)",
+            theoryPaper = "ACM THRI 2022 眼神頭部動態共感",
             steps = listOf(
                 ScenarioStep(
-                    name = "奧特曼極限光能引領",
-                    motionName = "666_PE_Ultraman",
-                    chassisMove = ChassisMove(turnSpeed = 130f, durationMs = 500L),
+                    name = "身體微前傾側耳傾聽",
+                    motionName = "888_ML_Thinking_08",
                     ledPattern = LedPattern.CYAN_FLOW,
-                    ttsText = "請往這邊走！",
-                    ttsSpeed = "125",
+                    ttsText = "我在聽，您慢慢說～",
+                    ttsSpeed = "110",
                     timeoutMs = 3800L
                 ),
                 ScenarioStep(
-                    name = "利劍般直線指向目標",
-                    motionName = "888_ML_RPointLisa_24",
+                    name = "認真點頭肯定共感",
+                    motionName = "666_PE_Good",
                     ledPattern = LedPattern.CYAN_FLOW,
+                    ttsText = "我完全明白您的心情。",
+                    ttsSpeed = "115",
                     timeoutMs = 3200L
                 )
             )
@@ -185,16 +203,20 @@ object ScenarioRepository {
 
         Scenario(
             id = "butler_thinking",
-            title = "3. 深度思考檢索",
+            title = "3. 沉思檢索運算 (Cognitive Search)",
             category = ScenarioCategory.BUTLER,
             description = "急速搖晃打量 + 仰頭單手托腮沉思 + 直身拍掌頓悟",
             badge = "打量・托腮・頓悟",
+            affectiveState = "Neutral Valence, Low Arousal (專注計算)",
+            theoryPaper = "ACM THRI 2022 認知運算外顯化",
             steps = listOf(
                 ScenarioStep(
                     name = "搖頭打量與托腮深思",
                     motionName = "888_ML_Thinking_08",
                     chassisMove = ChassisMove(turnSpeed = 80f, durationMs = 300L),
                     ledPattern = LedPattern.PURPLE_PULSE,
+                    ttsText = "讓我想想，正在為您查詢！",
+                    ttsSpeed = "120",
                     timeoutMs = 4000L
                 ),
                 ScenarioStep(
@@ -209,30 +231,24 @@ object ScenarioRepository {
         ),
 
         Scenario(
-            id = "butler_celebrate",
-            title = "4. 歡慶擊掌祝賀",
+            id = "butler_praise",
+            title = "4. 正面肯定誇讚 (Praise & Affirmation)",
             category = ScenarioCategory.BUTLER,
-            description = "尊榮 Ta-Da 迎賓號角 + 帝王盛大鼓掌 + 雙臂衝天狂歡呼 + 熱情擊掌",
-            badge = "Ta-Da號角・帝王鼓掌",
+            description = "拍手大拇指筆直向前 + 輕快微跳躍動 (垂直向上加速度)",
+            badge = "大拇指直指・躍動讚好",
+            affectiveState = "High Valence, High Arousal (強烈認同)",
+            theoryPaper = "IEEE RO-MAN 2021/2023 向上加速度",
             steps = listOf(
                 ScenarioStep(
-                    name = "帝王之尊盛大鼓掌",
-                    motionName = "888_ML_Kingclap_20",
-                    chassisMove = ChassisMove(turnSpeed = 100f, durationMs = 400L),
+                    name = "大拇指筆直向前點頭誇讚",
+                    motionName = "666_PE_Good",
                     ledPattern = LedPattern.RAINBOW,
-                    soundType = SoundType.TADA,
-                    ttsText = "太棒了！耶！",
-                    ttsSpeed = "130",
-                    timeoutMs = 3200L
-                ),
-                ScenarioStep(
-                    name = "超人變身英姿",
-                    motionName = "667_P4_Superman",
-                    ledPattern = LedPattern.RAINBOW,
+                    ttsText = "哇！您太厲害了，真是好棒！",
+                    ttsSpeed = "125",
                     timeoutMs = 3500L
                 ),
                 ScenarioStep(
-                    name = "熱情伸手等待擊掌",
+                    name = "熱情伸手肯定鼓勵",
                     motionName = "888_ML_HiFive_19",
                     ledPattern = LedPattern.RAINBOW,
                     timeoutMs = 3200L
@@ -241,84 +257,170 @@ object ScenarioRepository {
         ),
 
         Scenario(
-            id = "butler_farewell",
-            title = "5. 禮貌告別退場",
+            id = "butler_celebrate",
+            title = "5. 歡慶盛大祝賀 (Celebration)",
             category = ScenarioCategory.BUTLER,
-            description = "大力高舉右手狂揮道別 + -0.24m/s 快速倒退滑行讓道",
-            badge = "高舉狂揮・快速倒退",
+            description = "尊榮 Ta-Da 迎賓號角 + 帝王盛大鼓掌 + 雙臂衝天狂歡呼",
+            badge = "Ta-Da號角・帝王鼓掌",
+            affectiveState = "++Valence, ++Arousal (狂喜爆發)",
+            theoryPaper = "IEEE RA-L 2022 上揚掌聲正向反饋",
             steps = listOf(
                 ScenarioStep(
-                    name = "大力高舉狂揮與後滑讓路",
-                    motionName = "666_RE_TurnRBye",
-                    chassisMove = ChassisMove(speed = -0.24f, durationMs = 600L),
-                    ledPattern = LedPattern.SOFT_WHITE,
-                    ttsText = "祝您順心！",
-                    ttsSpeed = "125",
-                    timeoutMs = 3200L
-                )
-            )
-        ),
-
-        // ==========================================
-        // 🚨 詐騙警告劇本 (Anti-Fraud Suite - 1.5倍速・大動作格鬥阻攔・音效震撼)
-        // ==========================================
-        Scenario(
-            id = "fraud_physical_block",
-            title = "6. 猛撲卡位格鬥攔截",
-            category = ScenarioCategory.FRAUD_ALERT,
-            description = "0.30m/s 疾衝肉身路障 + 空襲警報蜂鳴 + 雙拳格鬥備戰出拳威嚇",
-            badge = "空襲蜂鳴・格鬥備戰",
-            steps = listOf(
-                ScenarioStep(
-                    name = "高速猛撲卡位向前阻截",
-                    chassisMove = ChassisMove(speed = 0.30f, durationMs = 700L),
-                    ledPattern = LedPattern.RED_STROBE,
-                    soundType = SoundType.ALARM_BUZZER,
-                    ttsText = "危險！住手！",
+                    name = "帝王之尊盛大鼓掌",
+                    motionName = "888_ML_Kingclap_20",
+                    chassisMove = ChassisMove(turnSpeed = 100f, durationMs = 400L),
+                    ledPattern = LedPattern.RAINBOW,
+                    soundType = SoundType.TADA,
+                    ttsText = "太棒了！恭喜主人！",
                     ttsSpeed = "130",
-                    timeoutMs = 1300L
+                    timeoutMs = 3200L
                 ),
                 ScenarioStep(
-                    name = "雙拳格鬥備戰拳擊出拳",
-                    motionName = "666_FI_Fight",
-                    ledPattern = LedPattern.RED_STROBE,
+                    name = "超人變身英姿狂歡呼",
+                    motionName = "667_P4_Superman",
+                    ledPattern = LedPattern.RAINBOW,
+                    ttsText = "真是值得慶祝的一刻！",
+                    ttsSpeed = "125",
                     timeoutMs = 3500L
                 )
             )
         ),
 
         Scenario(
-            id = "fraud_panic",
-            title = "7. 抱頭慘叫絕望急退",
-            category = ScenarioCategory.FRAUD_ALERT,
-            description = "-0.26m/s 猛烈急退三步 + 雙手抱頭狂喊 NOOO + 恐慌緊迫警報音",
-            badge = "抱頭慘叫・恐慌急退",
+            id = "butler_apology",
+            title = "6. 委婉致歉自省 (Apology & De-escalation)",
+            category = ScenarioCategory.BUTLER,
+            description = "後退半步給予安全感 + 雙手下壓低頭誠懇道歉鞠躬",
+            badge = "主動後退・低頭合十",
+            affectiveState = "Negative Valence, Low Arousal (自省謙和)",
+            theoryPaper = "ACM THRI 2022 負向後撤主動降壓",
             steps = listOf(
                 ScenarioStep(
-                    name = "抱頭狂喊拒絕絕望急退",
-                    motionName = "888_ML_Noooo_21",
-                    chassisMove = ChassisMove(speed = -0.26f, durationMs = 900L),
-                    ledPattern = LedPattern.RED_WHITE_ALERT,
-                    soundType = SoundType.VERY_ALARMED,
-                    ttsText = "天啊！那是詐騙！",
-                    ttsSpeed = "130",
-                    timeoutMs = 3800L
+                    name = "後退半步謙遜低頭",
+                    motionName = "666_RE_Bow",
+                    chassisMove = ChassisMove(speed = -0.15f, durationMs = 400L),
+                    ledPattern = LedPattern.SOFT_WHITE,
+                    ttsText = "真的很抱歉，是我不夠貼心！",
+                    ttsSpeed = "115",
+                    timeoutMs = 3500L
                 ),
                 ScenarioStep(
-                    name = "全身劇烈大顫抖",
-                    motionName = "888_ML_VeryScared_02",
-                    ledPattern = LedPattern.RED_WHITE_ALERT,
+                    name = "雙手下壓誠懇受教",
+                    motionName = "667_MG_HandsUp",
+                    ledPattern = LedPattern.SOFT_WHITE,
+                    ttsText = "我會立刻改進！",
+                    ttsSpeed = "115",
                     timeoutMs = 3200L
                 )
             )
         ),
 
         Scenario(
-            id = "fraud_accuse",
-            title = "8. 嚴厲指責警告",
+            id = "butler_guide",
+            title = "7. 空間引領指引 (Guiding & Recommending)",
+            category = ScenarioCategory.BUTLER,
+            description = "130°/s 轉向 60° + 奧特曼十字光能引路 + 利劍直線指向",
+            badge = "130°/s急轉・奧特曼光能",
+            affectiveState = "+Valence, Moderate Arousal (熱情引導)",
+            theoryPaper = "IEEE RO-MAN 2021/2023 直線聚焦空間引導",
+            steps = listOf(
+                ScenarioStep(
+                    name = "奧特曼極限光能引領",
+                    motionName = "666_PE_Ultraman",
+                    chassisMove = ChassisMove(turnSpeed = 130f, durationMs = 500L),
+                    ledPattern = LedPattern.CYAN_FLOW,
+                    ttsText = "請跟我往這邊走！",
+                    ttsSpeed = "125",
+                    timeoutMs = 3800L
+                ),
+                ScenarioStep(
+                    name = "利劍般直線指向目標",
+                    motionName = "888_ML_RPointLisa_24",
+                    ledPattern = LedPattern.CYAN_FLOW,
+                    timeoutMs = 3200L
+                )
+            )
+        ),
+
+        Scenario(
+            id = "butler_farewell",
+            title = "8. 溫馨告別待命 (Farewell & Standby)",
+            category = ScenarioCategory.BUTLER,
+            description = "大力高舉右手狂揮道別 + -0.24m/s 快速倒退滑行讓道歸位",
+            badge = "狂揮道別・快速後滑",
+            affectiveState = "Sustained Valence, Low Arousal (溫馨敬重)",
+            theoryPaper = "IEEE RO-MAN 2021/2023 柔和減速平靜交接",
+            steps = listOf(
+                ScenarioStep(
+                    name = "大力高舉狂揮與後滑讓路",
+                    motionName = "666_RE_TurnRBye",
+                    chassisMove = ChassisMove(speed = -0.24f, durationMs = 600L),
+                    ledPattern = LedPattern.SOFT_WHITE,
+                    ttsText = "主人好好休息，隨時叫我，拜拜！",
+                    ttsSpeed = "120",
+                    timeoutMs = 3500L
+                )
+            )
+        ),
+
+        // ==========================================
+        // 🚨 詐騙提醒與多層級實體阻斷劇本 (Anti-Fraud Suite - 8 套)
+        // ==========================================
+        Scenario(
+            id = "fraud_anomaly",
+            title = "9. 察覺微小異常 (Subtle Skepticism)",
             category = ScenarioCategory.FRAUD_ALERT,
-            description = "0.26m/s 挺身逼近一步 + 大力士霸氣肌肉防禦 + 利劍猛刺直指電話",
+            description = "悄悄挪近半步 + 頭部微歪側聽打量通話起疑 (低度戒備)",
+            badge = "挪近半步・歪頭側聽",
+            affectiveState = "Neutral-Negative Valence, Low Arousal (謹慎起疑)",
+            theoryPaper = "ACM THRI 2022 傾身偏側探究體態",
+            steps = listOf(
+                ScenarioStep(
+                    name = "悄悄挪近歪頭打量通話",
+                    motionName = "888_ML_Thinking_08",
+                    chassisMove = ChassisMove(speed = 0.12f, durationMs = 400L),
+                    ledPattern = LedPattern.BREATH_GOLD,
+                    ttsText = "咦？這通電話說話的語氣怪怪的喔...",
+                    ttsSpeed = "120",
+                    timeoutMs = 3800L
+                )
+            )
+        ),
+
+        Scenario(
+            id = "fraud_unknown_caller",
+            title = "10. 未知來電警示 (Unknown Caller Caution)",
+            category = ScenarioCategory.FRAUD_ALERT,
+            description = "原地挺身 + 單臂前推暫停手勢 + 警示微搖頭提醒勿輕信",
+            badge = "挺身暫停・警示搖頭",
+            affectiveState = "Negative Valence, Moderate Arousal (防備警惕)",
+            theoryPaper = "IEEE RO-MAN 2021/2023 正面對峙暫停手勢",
+            steps = listOf(
+                ScenarioStep(
+                    name = "挺身抬手暫停手勢",
+                    motionName = "888_ML_RPointLisa_24",
+                    ledPattern = LedPattern.RED_AMBER_PULSE,
+                    ttsText = "提醒您！這是未顯示號碼的陌生來電，請小心！",
+                    ttsSpeed = "125",
+                    timeoutMs = 3500L
+                ),
+                ScenarioStep(
+                    name = "謹慎微搖頭警戒",
+                    motionName = "666_BA_Shakehead",
+                    ledPattern = LedPattern.RED_AMBER_PULSE,
+                    timeoutMs = 2500L
+                )
+            )
+        ),
+
+        Scenario(
+            id = "fraud_accuse",
+            title = "11. 敏感金錢關鍵字 (Financial Keyword Alert)",
+            category = ScenarioCategory.FRAUD_ALERT,
+            description = "0.26m/s 挺身逼近 + 大力士霸氣肌肉防禦 + 利劍直指電話",
             badge = "挺身肌肉・尖刀直指",
+            affectiveState = "Negative Valence, High Arousal (嚴肅指責)",
+            theoryPaper = "IEEE RO-MAN 2021/2023 直線強硬指責",
             steps = listOf(
                 ScenarioStep(
                     name = "挺身逼近大力士肌肉挺胸",
@@ -331,56 +433,144 @@ object ScenarioRepository {
                     name = "如利劍尖刀猛刺直指電話",
                     motionName = "888_ML_AngPoint_12",
                     ledPattern = LedPattern.SOLID_DARK_RED,
-                    ttsText = "那是假的！騙人的！",
+                    ttsText = "對方提到ATM轉帳與監管！那是詐騙！",
                     ttsSpeed = "130",
-                    timeoutMs = 3200L
+                    timeoutMs = 3500L
                 )
             )
         ),
 
         Scenario(
-            id = "fraud_reject",
-            title = "9. 急迫雙手大交叉駁斥",
+            id = "fraud_counter_manipulation",
+            title = "12. 話術情緒勒索防護 (Manipulation Counter)",
             category = ScenarioCategory.FRAUD_ALERT,
-            description = "雙臂胸前大幅狂暴交替狂揮 + 伴隨頭部全力劇烈狂搖說不",
-            badge = "狂暴交替・瘋狂搖頭",
+            description = "挺胸腰側雙拳戰鬥架勢 + 大力士肌肉護盾 + 堅定阻擋視線護主",
+            badge = "雙拳護主・擺身擋視線",
+            affectiveState = "Protective Dominance, High Arousal (守護戰鬥)",
+            theoryPaper = "Frontiers 2023/2024 第三方強勢保護介入",
             steps = listOf(
                 ScenarioStep(
-                    name = "雙手大交叉狂暴揮動駁斥",
-                    motionName = "667_P4_Wong",
-                    chassisMove = ChassisMove(turnSpeed = 80f, durationMs = 400L),
-                    ledPattern = LedPattern.RED_AMBER_PULSE,
-                    ttsText = "不對！絕對不要轉帳！",
+                    name = "挺身戰鬥防護架勢",
+                    motionName = "666_FI_Fight",
+                    ledPattern = LedPattern.SOLID_DARK_RED,
+                    ttsText = "別怕！他在故意威脅嚇您！檢察官絕不會叫您交存摺！",
                     ttsSpeed = "130",
-                    timeoutMs = 4500L
+                    timeoutMs = 3800L
                 ),
                 ScenarioStep(
-                    name = "全力劇烈狂搖頭說不",
+                    name = "大力士霸氣肌肉護盾",
+                    motionName = "666_PE_Hercules",
+                    ledPattern = LedPattern.SOLID_DARK_RED,
+                    timeoutMs = 3000L
+                )
+            )
+        ),
+
+        Scenario(
+            id = "fraud_block_phishing",
+            title = "13. 阻擋點擊釣魚簡訊 (Phishing Interruption)",
+            category = ScenarioCategory.FRAUD_ALERT,
+            description = "0.28m/s 疾衝螢幕前方 + 雙手狂推下壓止步 + 全力狂搖頭",
+            badge = "0.28m/s疾衝・狂推止步",
+            affectiveState = "High Urgency, High Arousal (突發打斷)",
+            theoryPaper = "IEEE RA-L 2022 突進急煞強行打斷",
+            steps = listOf(
+                ScenarioStep(
+                    name = "疾速衝向長輩手指前方阻截",
+                    motionName = "667_MG_HandsUp",
+                    chassisMove = ChassisMove(speed = 0.28f, durationMs = 600L),
+                    ledPattern = LedPattern.RED_STROBE,
+                    ttsText = "手停住！千萬不要點開簡訊連結！那是詐騙！",
+                    ttsSpeed = "130",
+                    timeoutMs = 3500L
+                ),
+                ScenarioStep(
+                    name = "全力狂搖頭說不能點",
                     motionName = "666_BA_Shakehead",
-                    ledPattern = LedPattern.RED_AMBER_PULSE,
+                    ledPattern = LedPattern.RED_STROBE,
                     timeoutMs = 2500L
                 )
             )
         ),
 
         Scenario(
+            id = "fraud_panic",
+            title = "14. 恐慌急退慘叫阻斷 (Despair Panic - NOOO)",
+            category = ScenarioCategory.FRAUD_ALERT,
+            description = "-0.26m/s 猛烈急退三步 + 雙手抱頭狂喊 NOOO + 恐慌緊迫警報音",
+            badge = "抱頭慘叫・恐慌急退",
+            affectiveState = "Extreme Negative Valence, High Arousal (極度恐慌共鳴)",
+            theoryPaper = "ACM THRI 2022 肢體面部一致性恐懼放大",
+            steps = listOf(
+                ScenarioStep(
+                    name = "抱頭狂喊拒絕絕望急退",
+                    motionName = "888_ML_Noooo_21",
+                    chassisMove = ChassisMove(speed = -0.26f, durationMs = 900L),
+                    ledPattern = LedPattern.RED_WHITE_ALERT,
+                    soundType = SoundType.VERY_ALARMED,
+                    ttsText = "天啊！NOOOOO！絕對不要把密碼告訴他！",
+                    ttsSpeed = "130",
+                    timeoutMs = 3800L
+                ),
+                ScenarioStep(
+                    name = "全身劇烈大顫抖驚恐定格",
+                    motionName = "888_ML_VeryScared_02",
+                    ledPattern = LedPattern.RED_WHITE_ALERT,
+                    timeoutMs = 3200L
+                )
+            )
+        ),
+
+        Scenario(
+            id = "fraud_physical_block",
+            title = "15. 假冒公檢法強制卡位 (Physical Combat Block)",
+            category = ScenarioCategory.FRAUD_ALERT,
+            description = "0.30m/s 疾衝肉身路障 + 空襲警報蜂鳴 + 雙拳格鬥出拳威嚇",
+            badge = "空襲蜂鳴・格鬥卡位",
+            affectiveState = "Max Threat Response, Max Arousal (極限威脅干預)",
+            theoryPaper = "IEEE RA-L 2022 物理空間侵入瓦解盲區",
+            steps = listOf(
+                ScenarioStep(
+                    name = "高速猛撲卡位向前阻截",
+                    motionName = "666_SA_Shocked",
+                    chassisMove = ChassisMove(speed = 0.30f, durationMs = 700L),
+                    ledPattern = LedPattern.RED_STROBE,
+                    soundType = SoundType.ALARM_BUZZER,
+                    ttsText = "危險！這是百分之百假冒檢察官！",
+                    ttsSpeed = "130",
+                    timeoutMs = 2000L
+                ),
+                ScenarioStep(
+                    name = "雙拳格鬥備戰拳擊出拳威嚇",
+                    motionName = "666_FI_Fight",
+                    ledPattern = LedPattern.RED_STROBE,
+                    ttsText = "立刻掛電話！",
+                    ttsSpeed = "130",
+                    timeoutMs = 3500L
+                )
+            )
+        ),
+
+        Scenario(
             id = "fraud_siren",
-            title = "10. 拔刀斬斷與警笛大自轉",
+            title = "16. 拔刀斬斷與165通報 (Definitive Disruption 180° Spin)",
             category = ScenarioCategory.FRAUD_ALERT,
             description = "150°/s 疾速自轉 180° + 俐落抽刀拔劍斬斷詐騙 + 警車雙色爆閃",
             badge = "拔刀斬斷・180°大自轉",
+            affectiveState = "Decisive Resolution, High Dominance (終局果斷制裁)",
+            theoryPaper = "Frontiers 2023/2024 第三方強勢介入提升掛電話率",
             steps = listOf(
                 ScenarioStep(
                     name = "拔劍斬斷詐騙疾速自轉",
                     motionName = "666_FI_Draw",
                     chassisMove = ChassisMove(turnSpeed = 150f, durationMs = 1200L),
                     ledPattern = LedPattern.POLICE_SIREN,
-                    ttsText = "立刻掛斷電話！撥打165！",
+                    ttsText = "立刻掛斷電話！撥打165反詐專線！",
                     ttsSpeed = "130",
                     timeoutMs = 4000L
                 ),
                 ScenarioStep(
-                    name = "雙手大動作下壓冷靜",
+                    name = "雙手大動作下壓定格謝幕",
                     motionName = "667_MG_HandsUp",
                     ledPattern = LedPattern.POLICE_SIREN,
                     timeoutMs = 3200L

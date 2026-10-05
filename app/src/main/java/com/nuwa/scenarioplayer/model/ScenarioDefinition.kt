@@ -45,5 +45,7 @@ data class Scenario(
     val category: ScenarioCategory,
     val description: String,
     val badge: String,
+    val affectiveState: String = "",
+    val theoryPaper: String = "",
     val steps: List<ScenarioStep>
 )

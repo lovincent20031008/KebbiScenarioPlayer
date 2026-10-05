@@ -45,6 +45,8 @@ class ScenarioHttpServer(
                             put("category", s.category.name)
                             put("description", s.description)
                             put("badge", s.badge)
+                            put("affectiveState", s.affectiveState)
+                            put("theoryPaper", s.theoryPaper)
                             put("stepCount", s.steps.size)
                         })
                     }

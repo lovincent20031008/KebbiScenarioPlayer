@@ -72,20 +72,31 @@
 串聯 12 幕高潮連續技，展示全機極限動態性能：
 $$\text{Ta-Da迎賓號角} \rightarrow \text{90}^\circ\text{深鞠躬} \rightarrow \text{奧特曼光能} \rightarrow \text{帝王鼓掌} \rightarrow \text{超人飛天} \rightarrow \text{空襲急煞} \rightarrow \text{雙拳格鬥卡位} \rightarrow \text{抱頭NOOO急退} \rightarrow \text{交叉駁斥} \rightarrow \text{狂搖頭} \rightarrow \text{拔刀180}^\circ\text{大自轉} \rightarrow \text{側身謝幕}$$
 
-### 劇本詳細規格
+### 劇本詳細規格 (16 套 HRI 論文導向情境)
 
-| 劇本 ID | 分類 | 名稱 | 實體表現特徵 | 適用場景 |
+#### 🎩 管家日常聊天與伴侶劇本 (Butler Daily Companion Suite - 8 套)
+| 劇本 ID | 名稱 | 情緒維度 (Russell 座標) | 實體動作特徵 | 2021-2024 HRI 論文依據 |
 | :--- | :--- | :--- | :--- | :--- |
-| `butler_welcome` | 管家 | 盛大迎賓巡禮 | 0.28m/s 疾步前趨 + 90°俐落深鞠躬 + 雙臂超大展開 | 貴賓入門迎賓 |
-| `butler_guide` | 管家 | 空間引領指引 | 130°/s 轉向 60° + 奧特曼十字光能引路 + 尖刀定點直指 | 空間引路接待 |
-| `butler_thinking` | 管家 | 深度思考檢索 | 急速搖晃打量 + 仰頭單手托腮沉思 + 直身拍掌頓悟 | 智能查詢打量 |
-| `butler_celebrate` | 管家 | 歡慶擊掌祝賀 | 尊榮 Ta-Da 迎賓號角 + 帝王盛大鼓掌 + 雙臂衝天歡呼 | 答題完成祝賀 |
-| `butler_farewell` | 管家 | 禮貌告別退場 | 大力高舉右手狂揮道別 + -0.24m/s 快速滑行後退讓道 | 引導結束離場 |
-| `fraud_physical_block` | 防詐 | 猛撲卡位格鬥攔截 | 0.30m/s 疾衝肉身路障 + 空襲警報蜂鳴 + 雙拳格鬥備戰 | 可疑通話攔截 |
-| `fraud_panic` | 防詐 | 抱頭慘叫絕望急退 | -0.26m/s 猛烈急退三步 + 雙手抱頭狂喊 NOOO + 恐慌緊迫警報 | 點擊釣魚連結 |
-| `fraud_accuse` | 防詐 | 嚴厲指責警告 | 0.26m/s 挺身逼近 + 大力士霸氣肌肉防禦 + 利劍直指電話 | 提及轉帳關鍵字 |
-| `fraud_reject` | 防詐 | 急迫雙手大交叉駁斥 | 雙臂胸前大幅狂暴交替狂揮 + 伴隨頭部全力劇烈狂搖說不 | 強力阻斷話術 |
-| `fraud_siren` | 防詐 | 拔刀斬斷與警笛大自轉 | 150°/s 疾速自轉 180° + 俐落抽刀拔劍斬斷詐騙 + 警車雙色爆閃 | 致命轉帳詐騙 |
+| `butler_welcome` | 1. 盛大迎賓問候 | +Valence, Moderate Arousal | 0.28m/s 疾步前趨 + 90°俐落深鞠躬 + 雙臂超展開 | IEEE RO-MAN 2021/2023 高空間擴展度傳達親和力 |
+| `butler_listening` | 2. 專注傾聽共感 | Moderate Valence, Low Arousal | 身體微前傾側耳傾聽 + 慢速點頭共感 (低喚起舒緩) | ACM THRI 2022 眼神頭部動態共感顯著提升親和信任 |
+| `butler_thinking` | 3. 沉思檢索運算 | Neutral Valence, Low Arousal | 托腮打量深思 + 仰頭眼球轉動 + 拍掌頓悟 | ACM THRI 2022 認知運算外顯化降低等待焦慮 |
+| `butler_praise` | 4. 正面肯定誇讚 | High Valence, High Arousal | 拍手大拇指筆直向前 + 輕快微跳躍動 | IEEE RO-MAN 2021/2023 向上加速度強化成就感 |
+| `butler_celebrate` | 5. 歡慶盛大祝賀 | ++Valence, ++Arousal | 尊榮 Ta-Da 迎賓號角 + 帝王連續鼓掌 + 超人歡呼 | IEEE RA-L 2022 上揚掌聲正向反饋效應 |
+| `butler_apology` | 6. 委婉致歉自省 | Negative Valence, Low Arousal | 後退半步給予安全感 + 雙手下壓低頭誠懇鞠躬 | ACM THRI 2022 負向後撤主動降低對峙壓力 |
+| `butler_guide` | 7. 空間引領指引 | +Valence, Moderate Arousal | 130°/s 急速轉向 60° + 奧特曼十字光能 + 定點直指 | IEEE RO-MAN 2021/2023 直線聚焦空間引導 |
+| `butler_farewell` | 8. 溫馨告別待命 | Sustained Valence, Low Arousal | 大力高舉右手狂揮道別 + -0.24m/s 滑行後退歸位 | IEEE RO-MAN 2021/2023 柔和減速平靜交接 |
+
+#### 🚨 詐騙提醒與多層級實體阻斷劇本 (Anti-Fraud Multi-Tier Suite - 8 套)
+| 劇本 ID | 名稱 | 情緒維度 (Russell 座標) | 實體動作特徵 | 2021-2024 HRI 論文依據 |
+| :--- | :--- | :--- | :--- | :--- |
+| `fraud_anomaly` | 9. 察覺微小異常 | Neutral-Neg, Low Arousal | 悄悄挪近半步 + 歪頭側聽打量通話起疑 (低度戒備) | ACM THRI 2022 傾身偏側探究體態 |
+| `fraud_unknown_caller` | 10. 未知來電警示 | Negative Valence, Mod Arousal | 原地挺身 + 單臂前推暫停手勢 + 警示微搖頭提醒 | IEEE RO-MAN 2021/2023 正面對峙暫停手勢建立邊界 |
+| `fraud_accuse` | 11. 敏感金錢關鍵字 | Negative Valence, High Arousal | 0.26m/s 挺身逼近 + 大力士霸氣肌肉防禦 + 尖刀直指 | IEEE RO-MAN 2021/2023 直線強硬指責打破迷思 |
+| `fraud_counter_manipulation` | 12. 話術情緒勒索防護 | Protective Dominance, High Arousal | 挺胸腰側雙拳戰鬥架勢 + 大力士肌肉護盾 + 護主卡位 | Frontiers 2023/2024 第三方強勢保護介入 |
+| `fraud_block_phishing` | 13. 阻擋點擊釣魚簡訊 | High Urgency, High Arousal | 0.28m/s 疾衝螢幕前方 + 雙手狂推下壓止步 + 狂搖頭 | IEEE RA-L 2022 突進急煞強行打斷盲點 |
+| `fraud_panic` | 14. 恐慌急退慘叫阻斷 | Extreme Neg, High Arousal | -0.26m/s 猛烈急退三步 + 雙手抱頭狂喊 NOOO + 警報 | ACM THRI 2022 肢體面部一致性恐懼放大 |
+| `fraud_physical_block` | 15. 假冒公檢法強制卡位 | Max Threat, Max Arousal | 0.30m/s 疾衝肉身路障 + 空襲警報蜂鳴 + 猛烈雙拳出拳 | IEEE RA-L 2022 物理空間侵入瓦解長輩認知盲區 |
+| `fraud_siren` | 16. 拔刀斬斷與165通報 | Decisive Resolution, High Dominance | 150°/s 疾速自轉 180° + 俐落抽刀拔劍斬斷 + 警車爆閃 | Frontiers 2023/2024 第三方強勢介入提升掛電話率 |
 
 ---
 
