@@ -69,6 +69,21 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
     _checkVoskModelCached();
     // Request microphone permission proactively
     _checkMicPermission();
+    // Welcome user with grand bow & open arms
+    _playWelcomeScenario();
+  }
+
+  Future<void> _playWelcomeScenario() async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    if (!mounted) return;
+    try {
+      final available = await KebbiService.isKebbiAvailable();
+      if (available) {
+        await KebbiService.playScenario(KebbiScenario.welcome);
+      }
+    } catch (e) {
+      debugPrint('[Butler] playWelcomeScenario error: $e');
+    }
   }
 
   Future<void> _checkMicPermission() async {
@@ -138,7 +153,8 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
       }
     } else {
       setState(() {
-        _liveTranscript = text.isNotEmpty ? text : 'Listening…';
+        _liveTranscript = text;
+        _textController.text = text;
       });
     }
   }
@@ -330,6 +346,7 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
       _liveTranscript = 'Butler is thinking…';
     });
     _scrollToBottom();
+    KebbiService.playScenario(KebbiScenario.thinking);
 
     try {
       final result = await sl<ApiService>().sendChat(
@@ -350,6 +367,7 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
         _liveTranscript = 'Tap mic to start recording...';
       });
       _scrollToBottom();
+      _triggerButlerReplyScenario(result.text);
 
       if (result.audioBytes != null) {
         await AudioService.I.playMp3Bytes(
@@ -570,6 +588,52 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
       ),
     );
   }
+
+  void _triggerButlerReplyScenario(String replyText) {
+    final lower = replyText.toLowerCase();
+
+    const celebrateWords = [
+      'congratulations',
+      'well done',
+      'wonderful',
+      'excellent',
+      'happy birthday',
+    ];
+    const farewellWords = [
+      'goodbye',
+      'good night',
+      'take care',
+      'have a nice day',
+    ];
+    const guideWords = [
+      'this way',
+      'follow me',
+      'over there',
+      'let me show you',
+    ];
+
+    for (final w in celebrateWords) {
+      if (lower.contains(w)) {
+        KebbiService.playScenario(KebbiScenario.celebrate);
+        return;
+      }
+    }
+    for (final w in farewellWords) {
+      if (lower.contains(w)) {
+        KebbiService.playScenario(KebbiScenario.farewell);
+        return;
+      }
+    }
+    for (final w in guideWords) {
+      if (lower.contains(w)) {
+        KebbiService.playScenario(KebbiScenario.guide);
+        return;
+      }
+    }
+    // Default reply response
+    KebbiService.playScenario(KebbiScenario.celebrate);
+  }
+
 }
 
 enum _Speaker { user, butler }
