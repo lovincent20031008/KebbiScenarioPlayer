@@ -16,6 +16,10 @@ class KebbiScenario {
   static const celebrate = 'butler_celebrate';
   static const farewell = 'butler_farewell';
 
+  // 情緒分類用
+  static const acknowledge = 'butler_acknowledge';
+  static const comfort = 'butler_comfort';
+
   // 詐騙警告
   static const physicalBlock = 'fraud_physical_block';
   static const panic = 'fraud_panic';

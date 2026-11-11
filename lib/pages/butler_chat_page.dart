@@ -367,7 +367,7 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
         _liveTranscript = 'Tap mic to start recording...';
       });
       _scrollToBottom();
-      _triggerButlerReplyScenario(result.text);
+      _triggerButlerReplyScenario(result.sentiment);
 
       if (result.audioBytes != null) {
         await AudioService.I.playMp3Bytes(
@@ -589,49 +589,17 @@ class _ButlerChatPageState extends State<ButlerChatPage> {
     );
   }
 
-  void _triggerButlerReplyScenario(String replyText) {
-    final lower = replyText.toLowerCase();
+  /// 依情緒挑動作，沒有情緒時播 [KebbiScenario.acknowledge]。
+  void _triggerButlerReplyScenario(String? sentiment) {
+    const bySentiment = <String, String>{
+      Sentiment.positive: KebbiScenario.celebrate,
+      Sentiment.neutral: KebbiScenario.acknowledge,
+      Sentiment.negative: KebbiScenario.comfort,
+    };
 
-    const celebrateWords = [
-      'congratulations',
-      'well done',
-      'wonderful',
-      'excellent',
-      'happy birthday',
-    ];
-    const farewellWords = [
-      'goodbye',
-      'good night',
-      'take care',
-      'have a nice day',
-    ];
-    const guideWords = [
-      'this way',
-      'follow me',
-      'over there',
-      'let me show you',
-    ];
-
-    for (final w in celebrateWords) {
-      if (lower.contains(w)) {
-        KebbiService.playScenario(KebbiScenario.celebrate);
-        return;
-      }
-    }
-    for (final w in farewellWords) {
-      if (lower.contains(w)) {
-        KebbiService.playScenario(KebbiScenario.farewell);
-        return;
-      }
-    }
-    for (final w in guideWords) {
-      if (lower.contains(w)) {
-        KebbiService.playScenario(KebbiScenario.guide);
-        return;
-      }
-    }
-    // Default reply response
-    KebbiService.playScenario(KebbiScenario.celebrate);
+    KebbiService.playScenario(
+      bySentiment[sentiment] ?? KebbiScenario.acknowledge,
+    );
   }
 
 }

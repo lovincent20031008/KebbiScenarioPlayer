@@ -119,6 +119,37 @@ object ScenarioRepository {
         ),
     )
 
+    // 情緒分類用：neutral 與 negative 各一組
+    private val butlerAcknowledge = Scenario(
+        id = "butler_acknowledge",
+        title = "Acknowledge",
+        category = ScenarioCategory.BUTLER,
+        description = "Raises its right arm in a plain acknowledgement, for an emotionally neutral reply",
+        steps = listOf(
+            ScenarioStep(
+                name = "Raise right arm",
+                motionName = "666_BA_RArmS90",
+                ledPattern = LedPattern.SOFT_WHITE,
+                timeoutMs = 2800L,
+            ),
+        ),
+    )
+
+    private val butlerComfort = Scenario(
+        id = "butler_comfort",
+        title = "Comfort",
+        category = ScenarioCategory.BUTLER,
+        description = "Bows under soft white light, for bad news or when the user sounds upset",
+        steps = listOf(
+            ScenarioStep(
+                name = "Sympathetic bow",
+                motionName = "666_RE_Bow",
+                ledPattern = LedPattern.SOFT_WHITE,
+                timeoutMs = 3800L,
+            ),
+        ),
+    )
+
     private val fraudPhysicalBlock = Scenario(
         id = "fraud_physical_block",
         title = "Block the way",
@@ -252,6 +283,8 @@ object ScenarioRepository {
         butlerThinking,
         butlerCelebrate,
         butlerFarewell,
+        butlerAcknowledge,
+        butlerComfort,
         fraudPhysicalBlock,
         fraudPanic,
         fraudAccuse,
