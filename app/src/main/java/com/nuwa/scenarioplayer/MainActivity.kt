@@ -19,6 +19,9 @@ import com.nuwa.scenarioplayer.engine.ScenarioEngine
 import com.nuwa.scenarioplayer.model.Scenario
 import com.nuwa.scenarioplayer.model.ScenarioCategory
 import com.nuwa.scenarioplayer.model.ScenarioRepository
+import com.nuwa.scenarioplayer.preview.MotionPreview
+import com.nuwarobotics.service.facecontrol.UnityFaceManager
+import com.nuwarobotics.service.facecontrol.utils.ServiceConnectListener
 import com.nuwa.scenarioplayer.model.ScenarioStep
 import com.nuwa.scenarioplayer.server.ScenarioHttpServer
 import com.nuwarobotics.service.IClientId
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var ledManager: LedManager
     private lateinit var soundManager: SoundEffectManager
     private lateinit var engine: ScenarioEngine
+    private lateinit var motionPreview: MotionPreview
     private var httpServer: ScenarioHttpServer? = null
 
     private var robotReady = false
@@ -52,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvActiveStatus: TextView
     private lateinit var cbAutoFace: CheckBox
     private lateinit var btnEmergencyStop: Button
+    private lateinit var btnNext: Button
     private lateinit var btnMegaDemo: Button
     private lateinit var containerButlerCards: LinearLayout
     private lateinit var containerFraudCards: LinearLayout
@@ -65,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         tvActiveStatus = findViewById(R.id.tv_active_status)
         cbAutoFace = findViewById(R.id.cb_auto_face)
         btnEmergencyStop = findViewById(R.id.btn_emergency_stop)
+        btnNext = findViewById(R.id.btn_next)
         btnMegaDemo = findViewById(R.id.btn_mega_demo)
         val btnMegaDemoBanner: Button = findViewById(R.id.btn_mega_demo_banner)
         containerButlerCards = findViewById(R.id.container_butler_cards)
@@ -77,6 +83,11 @@ class MainActivity : AppCompatActivity() {
 
         btnEmergencyStop.setOnClickListener {
             engine.stop()
+        }
+
+        // 下一步：結束「維持姿勢」(模擬回覆到了 / 長輩說完了)
+        btnNext.setOnClickListener {
+            if (!engine.next()) Log.i(TAG, "Next pressed but no hold step is playing")
         }
 
         val onMegaDemoClick = {
@@ -93,6 +104,7 @@ class MainActivity : AppCompatActivity() {
     private fun initRobotSdk() {
         clientId = IClientId(packageName)
         robot = NuwaRobotAPI(this, clientId)
+        motionPreview = MotionPreview(robot)
 
         robot.registerRobotEventListener(object : RobotEventListener {
             override fun onWikiServiceStart() {
@@ -135,6 +147,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onCompleteOfMotionPlay(motion: String) {
                 Log.d(TAG, "onCompleteOfMotionPlay: $motion")
+                motionPreview.onMotionFinished(motion)
                 engine.onMotionComplete(motion)
             }
 
@@ -145,7 +158,9 @@ class MainActivity : AppCompatActivity() {
                 engine.onMotionError(errCode)
             }
 
-            override fun onPrepareMotion(p0: Boolean, p1: String, p2: Float) {}
+            override fun onPrepareMotion(p0: Boolean, p1: String, p2: Float) {
+                motionPreview.onPrepared(p0, p1, p2)
+            }
             override fun onCameraOfMotionPlay(p0: String) {}
             override fun onGetCameraPose(p0: Float, p1: Float, p2: Float, p3: Float, p4: Float, p5: Float, p6: Float, p7: Float, p8: Float, p9: Float, p10: Float, p11: Float) {}
             override fun onTouchEvent(p0: Int, p1: Int) {}
@@ -167,6 +182,17 @@ class MainActivity : AppCompatActivity() {
             override fun onDropSensorEvent(p0: Int) {}
             override fun onMotorErrorEvent(p0: Int, p1: Int) {}
         })
+
+        // 臉部控制服務：UnityFaceManager 必須先 init 才能 playMotion 換表情
+        try {
+            UnityFaceManager.getInstance().init(applicationContext, packageName, object : ServiceConnectListener {
+                override fun onConnectChanged(name: android.content.ComponentName?, connected: Boolean) {
+                    Log.i(TAG, "UnityFace service connected=$connected")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "UnityFaceManager init failed", e)
+        }
 
         if (robot.isKiWiServiceReady()) {
             robotReady = true
@@ -302,7 +328,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startHttpServer() {
         try {
-            httpServer = ScenarioHttpServer(HTTP_PORT, engine)
+            httpServer = ScenarioHttpServer(HTTP_PORT, engine, motionPreview)
             httpServer?.start()
             Log.i(TAG, "ScenarioHttpServer started on port $HTTP_PORT")
         } catch (e: IOException) {
