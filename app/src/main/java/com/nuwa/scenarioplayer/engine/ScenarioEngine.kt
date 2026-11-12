@@ -5,7 +5,11 @@ import android.os.Looper
 import android.util.Log
 import com.nuwarobotics.service.agent.NuwaRobotAPI
 import com.nuwarobotics.service.agent.VoiceEventListener
+import com.nuwarobotics.service.facecontrol.IonCompleteListener
+import com.nuwarobotics.service.facecontrol.UnityFaceManager
 import com.nuwa.scenarioplayer.audio.SoundEffectManager
+import com.nuwa.scenarioplayer.model.JointSafety
+import com.nuwa.scenarioplayer.model.JointTarget
 import com.nuwa.scenarioplayer.model.Scenario
 import com.nuwa.scenarioplayer.model.ScenarioStep
 
@@ -21,6 +25,7 @@ class ScenarioEngine(
 
     companion object {
         private const val TAG = "ScenarioEngine"
+        private const val FACE_DELAY_MS = 800L
     }
 
     interface ScenarioEngineListener {
@@ -71,7 +76,15 @@ class ScenarioEngine(
         Log.i(TAG, ">>> Starting Scenario: ${scenario.title} (${scenario.id}) with ${scenario.steps.size} steps <<<")
         listener?.onScenarioStarted(scenario)
 
-        executeStep(0)
+        if (scenario.face != null) {
+            // 臉部畫面需要 FACE_DELAY_MS 才會出現；動作一起延後，讓表情與動作同時開始
+            startFace(scenario)
+            mainHandler.postDelayed({
+                if (currentScenario === scenario && isPlaying) executeStep(0)
+            }, FACE_DELAY_MS)
+        } else {
+            executeStep(0)
+        }
         return true
     }
 
@@ -101,6 +114,12 @@ class ScenarioEngine(
         } catch (e: Exception) {
             Log.e(TAG, "motionStop failed", e)
         }
+
+        // 2b. 直接控制過的關節回到 0.0 參考位置 (motionStop 不會處理 ctlMotor)
+        returnJointsToReference(stoppedScenario)
+
+        // 2c. 換過臉的劇本：停止臉部動畫，回到預設臉
+        resetFaceIfUsed(stoppedScenario)
 
         // 3. 語音中斷
         try {
@@ -177,6 +196,11 @@ class ScenarioEngine(
             }
         }
 
+        // 5b. 直接關節控制 (情緒動作)：逐一檢查白名單，不在白名單內一律拒絕
+        if (step.jointTargets.isNotEmpty() && isMotorEnabled()) {
+            sendJointTargets(step.jointTargets)
+        }
+
         // 6. 設定看門狗定時器 (若動作無回調或超時，自動跳入下一步)
         setWatchdog(step.timeoutMs) {
             Log.w(TAG, "Step timeout reached for: ${step.name}, advancing...")
@@ -184,9 +208,84 @@ class ScenarioEngine(
         }
     }
 
+    private fun sendJointTargets(targets: List<JointTarget>) {
+        targets.forEach { t ->
+            if (!JointSafety.isAllowed(t)) {
+                Log.e(TAG, "Joint target REJECTED (outside tested range): motor=${t.motorId} deg=${t.degree} speed=${t.speed}")
+                return@forEach
+            }
+            try {
+                robot.ctlMotor(t.motorId, t.degree, t.speed)
+                Log.d(TAG, "ctlMotor motor=${t.motorId} deg=${t.degree} speed=${t.speed}")
+            } catch (e: Exception) {
+                Log.e(TAG, "ctlMotor failed: motor=${t.motorId}", e)
+            }
+        }
+    }
+
+    /** 只播臉部動畫 (IFaceControlService.playUnityFace)，不帶 JSON 內的 robotMotion */
+    fun playFaceAnimationNow(name: String): Boolean {
+        return try {
+            val face = UnityFaceManager.getInstance()
+            if (!face.isServiceConnected) return false
+            face.setAutoIdleAnimState(true)
+            face.showUnity()
+            face.playFaceAnimation(name)
+            Log.i(TAG, "Face animation '$name' requested")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Face animation failed: $name", e)
+            false
+        }
+    }
+
+    fun resetFace() {
+        try {
+            val face = UnityFaceManager.getInstance()
+            face.stopMotion()
+            face.setAutoIdleAnimState(false)
+            Log.i(TAG, "Face motion stopped (back to default face)")
+        } catch (e: Exception) {
+            Log.e(TAG, "Face reset failed", e)
+        }
+    }
+
+    private var faceStartRunnable: Runnable? = null
+
+    /** 劇本開始時換臉一次 (表情會停住)；FaceActivity 啟動需要時間，延遲 FACE_DELAY_MS */
+    private fun startFace(scenario: Scenario) {
+        val cue = scenario.face ?: return
+        stopFaceStart()
+        val r = Runnable {
+            if (currentScenario === scenario) playFaceAnimationNow(cue.name)
+        }
+        faceStartRunnable = r
+        mainHandler.postDelayed(r, FACE_DELAY_MS)
+    }
+
+    private fun stopFaceStart() {
+        faceStartRunnable?.let { mainHandler.removeCallbacks(it) }
+        faceStartRunnable = null
+    }
+
+    private fun resetFaceIfUsed(scenario: Scenario?) {
+        stopFaceStart()
+        if (scenario?.face == null) return
+        resetFace()
+    }
+
+    /** 中途停止時，把此劇本動過的關節送回 0.0 參考指令 (MOTOR_MAPPING.md 的回位值) */
+    private fun returnJointsToReference(scenario: Scenario?) {
+        val motors = scenario?.steps?.flatMap { s -> s.jointTargets.map { it.motorId } }?.toSet().orEmpty()
+        if (motors.isEmpty() || !isMotorEnabled()) return
+        Log.i(TAG, "Returning joints $motors to 0.0 reference")
+        sendJointTargets(motors.map { JointTarget(it, 0f) })
+    }
+
     private fun finishScenario() {
         val finished = currentScenario ?: return
         Log.i(TAG, ">>> Scenario completed: ${finished.title} <<<")
+        resetFaceIfUsed(finished)
 
         cancelWatchdog()
         chassisManager.emergencyStop()

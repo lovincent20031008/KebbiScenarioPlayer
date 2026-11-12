@@ -98,6 +98,27 @@ class ScenarioHttpServer(
                     newFixedLengthResponse(Response.Status.OK, "application/json", json)
                 }
 
+                // 只換臉、不動任何馬達 (表情測試用)
+                "/face/play" -> {
+                    val key = session.parameters["key"]?.firstOrNull()
+                    val ok = key != null && engine.playFaceAnimationNow(key)
+                    newFixedLengthResponse(Response.Status.OK, "application/json",
+                        JSONObject().apply { put("ok", ok); put("key", key) }.toString())
+                }
+
+                "/face/anim" -> {
+                    val name = session.parameters["name"]?.firstOrNull()
+                    val ok = name != null && engine.playFaceAnimationNow(name)
+                    newFixedLengthResponse(Response.Status.OK, "application/json",
+                        JSONObject().apply { put("ok", ok); put("name", name) }.toString())
+                }
+
+                "/face/reset" -> {
+                    engine.resetFace()
+                    newFixedLengthResponse(Response.Status.OK, "application/json",
+                        JSONObject().apply { put("ok", true) }.toString())
+                }
+
                 "/demo/start", "/demo" -> {
                     val demo = ScenarioRepository.megaDemoScenario
                     val success = engine.play(demo)

@@ -134,6 +134,176 @@ object ScenarioRepository {
         )
     )
 
+    // ==========================================
+    // 💬 情緒動作定義 (必須宣告在 allScenarios 之前，避免初始化順序造成 null)
+    // ==========================================
+
+    // ---- 可調參數 v3 (2026-11-12 實機回饋) ----
+    // 正面：側邊上下快速揮動 (側展關節 M5/M9)
+    private const val SIDE_UP = 80f          // 側舉上緣；SDK 上限 100 不碰端點
+    private const val SIDE_LOW = 20f         // 揮動下緣，不完全放下讓揮動連續
+    private const val SIDE_SPEED = 200f
+    private const val SIDE_ELBOW = -30f      // 手肘微彎較自然
+    private const val SWING_MS = 600L
+    // 中立：雙手說話手勢 (胸前高度、手掌輕擺)，頭微側；不舉高、不低頭、不點頭、不觸碰自己
+    private const val TALK_ARM = -90f        // 雙大臂前抬到胸前高度
+    private const val TALK_ELBOW = -60f      // 前臂向前
+    private const val TALK_ELBOW_BEAT = -30f // 手掌輕擺的另一端
+    private const val TALK_OPEN = 20f        // 雙臂微向外 (M9 已測 +20；右手 M5 +20 曾有幅度異常紀錄)
+    private const val TALK_SPEED = 90f
+    private const val TALK_HEAD = 15f        // 頭左右搖擺幅度 (M2：正=機器人左、負=右；已測 -15~+25)
+    private const val HEAD_SWAY_SPEED = 60f  // 30° 擺幅 / 60 ≈ 0.5 秒，配合每拍 BEAT_MS
+    private const val BEAT_MS = 500L
+    // 負面：低頭 + 垂手 + 收肩 + 難過表情
+    private const val SAD_HEAD = 25f         // ⚠️ 超過 SDK 文件 ±20，未經實測；有異音或卡住立即停止
+    private const val SAD_SHOULDER = -120f
+    private const val SAD_SPEED = 60f
+    /**
+     * 表情 = 臉部「動畫」名稱 (只換臉，不帶表情包配套動作)；這台凱比的臉部角色是 007。
+     * 2026-11-12 實機以 /face/anim 截圖確認：播一次會停住，/face/reset 後恢復預設臉。
+     * (表情包 JSON 如 007_P4_RPSTie 會連帶 robotMotion 身體動作，所以不用 JSON 名稱)
+     */
+    private val SAD_FACE = FaceCue("007_S2_Sad74")      // 難過流淚
+    private val HAPPY_FACE = FaceCue("007_J3_Happy61")  // 星星眼開心
+
+    private fun sideArms(deg: Float) = listOf(
+        JointTarget(Motor.R_SHOULDER_X, deg, SIDE_SPEED),
+        JointTarget(Motor.L_SHOULDER_X, deg, SIDE_SPEED)
+    )
+
+    /** 正面：雙臂從側邊對稱快速上下揮動 (Dael C8 / Gao B4) */
+    val sentimentPositive: Scenario = Scenario(
+        id = "butler_sentiment_positive",
+        title = "S1. 正面回覆・雙臂側邊揮動 (Positive)",
+        category = ScenarioCategory.BUTLER,
+        description = "雙臂由側邊快速上下揮動 4 次後回位，無台詞",
+        badge = "雙臂側舉快速揮動",
+        affectiveState = "Positive Valence, High Arousal (喜悅)",
+        theoryPaper = "Dael 2012 C8 (Elated joy 70%)；Gao 2024 B4 (Happiness 95.45%)",
+        face = HAPPY_FACE,
+        steps = listOf(
+            ScenarioStep(
+                name = "雙臂側舉・手肘微彎",
+                jointTargets = listOf(
+                    JointTarget(Motor.R_SHOULDER_Y, 0f, SIDE_SPEED),
+                    JointTarget(Motor.L_SHOULDER_Y, 0f, SIDE_SPEED),
+                    JointTarget(Motor.R_ELBOW, SIDE_ELBOW, SIDE_SPEED),
+                    JointTarget(Motor.L_ELBOW, SIDE_ELBOW, SIDE_SPEED)
+                ) + sideArms(SIDE_UP),
+                ledPattern = LedPattern.BREATH_GOLD,
+                timeoutMs = 700L
+            ),
+            ScenarioStep("揮下 1", jointTargets = sideArms(SIDE_LOW), ledPattern = LedPattern.BREATH_GOLD, timeoutMs = SWING_MS),
+            ScenarioStep("揮上 2", jointTargets = sideArms(SIDE_UP), ledPattern = LedPattern.BREATH_GOLD, timeoutMs = SWING_MS),
+            ScenarioStep("揮下 2", jointTargets = sideArms(SIDE_LOW), ledPattern = LedPattern.BREATH_GOLD, timeoutMs = SWING_MS),
+            ScenarioStep("揮上 3", jointTargets = sideArms(SIDE_UP), ledPattern = LedPattern.BREATH_GOLD, timeoutMs = SWING_MS),
+            ScenarioStep("揮下 3", jointTargets = sideArms(SIDE_LOW), ledPattern = LedPattern.BREATH_GOLD, timeoutMs = SWING_MS),
+            ScenarioStep("揮上 4", jointTargets = sideArms(SIDE_UP), ledPattern = LedPattern.BREATH_GOLD, timeoutMs = SWING_MS),
+            ScenarioStep(
+                name = "回位",
+                jointTargets = sideArms(0f) + listOf(
+                    JointTarget(Motor.R_ELBOW, 0f, SIDE_SPEED),
+                    JointTarget(Motor.L_ELBOW, 0f, SIDE_SPEED)
+                ),
+                ledPattern = LedPattern.BREATH_GOLD,
+                timeoutMs = 700L
+            )
+        )
+    )
+
+    /** 雙手手掌同步輕擺，頭同時左右搖擺 */
+    private fun talkBeat(elbow: Float, head: Float) = listOf(
+        JointTarget(Motor.L_ELBOW, elbow, TALK_SPEED),
+        JointTarget(Motor.R_ELBOW, elbow, TALK_SPEED),
+        JointTarget(Motor.NECK_Z, head, HEAD_SWAY_SPEED)
+    )
+
+    /** 中立：說話手勢 (論文無直接證據；避開各情緒群集特徵，最接近 Dael C2 無獨特模式) */
+    val sentimentNeutral: Scenario = Scenario(
+        id = "butler_sentiment_neutral",
+        title = "S2. 中立回覆・說話手勢 (Neutral)",
+        category = ScenarioCategory.BUTLER,
+        description = "雙手抬到胸前、手掌同步輕擺兩下像在說明，頭同時左右搖擺，然後回位；維持預設臉",
+        badge = "胸前說話手勢・頭左右擺",
+        affectiveState = "Neutral Valence, Moderate Arousal (一般對話)",
+        theoryPaper = "排除法：手在中間高度、頭水平、中速；避開 C8/B4(喜)、C10/B11(悲)、C11 觸碰自己(娛樂)、B7 叉腰(怒)",
+        steps = listOf(
+            ScenarioStep(
+                name = "雙手抬到胸前・頭轉左",
+                jointTargets = listOf(
+                    JointTarget(Motor.L_SHOULDER_Y, TALK_ARM, TALK_SPEED),
+                    JointTarget(Motor.L_ELBOW, TALK_ELBOW, TALK_SPEED),
+                    JointTarget(Motor.L_SHOULDER_X, TALK_OPEN, TALK_SPEED),
+                    JointTarget(Motor.R_SHOULDER_Y, TALK_ARM, TALK_SPEED),
+                    JointTarget(Motor.R_ELBOW, TALK_ELBOW, TALK_SPEED),
+                    JointTarget(Motor.R_SHOULDER_X, TALK_OPEN, TALK_SPEED),
+                    JointTarget(Motor.NECK_Z, TALK_HEAD, 55f)
+                ),
+                ledPattern = LedPattern.CYAN_FLOW,
+                timeoutMs = 1100L
+            ),
+            ScenarioStep("手掌擺 1", jointTargets = talkBeat(TALK_ELBOW_BEAT, -TALK_HEAD), ledPattern = LedPattern.CYAN_FLOW, timeoutMs = BEAT_MS),
+            ScenarioStep("手掌回 1", jointTargets = talkBeat(TALK_ELBOW, TALK_HEAD), ledPattern = LedPattern.CYAN_FLOW, timeoutMs = BEAT_MS),
+            ScenarioStep("手掌擺 2", jointTargets = talkBeat(TALK_ELBOW_BEAT, -TALK_HEAD), ledPattern = LedPattern.CYAN_FLOW, timeoutMs = BEAT_MS),
+            ScenarioStep("手掌回 2", jointTargets = talkBeat(TALK_ELBOW, TALK_HEAD), ledPattern = LedPattern.CYAN_FLOW, timeoutMs = BEAT_MS),
+            ScenarioStep(
+                name = "回位",
+                jointTargets = listOf(
+                    JointTarget(Motor.L_SHOULDER_Y, 0f, TALK_SPEED),
+                    JointTarget(Motor.L_ELBOW, 0f, TALK_SPEED),
+                    JointTarget(Motor.L_SHOULDER_X, 0f, TALK_SPEED),
+                    JointTarget(Motor.R_SHOULDER_Y, 0f, TALK_SPEED),
+                    JointTarget(Motor.R_ELBOW, 0f, TALK_SPEED),
+                    JointTarget(Motor.R_SHOULDER_X, 0f, TALK_SPEED),
+                    JointTarget(Motor.NECK_Z, 0f, 55f)
+                ),
+                ledPattern = LedPattern.CYAN_FLOW,
+                timeoutMs = 1100L
+            )
+        )
+    )
+
+    /** 負面：低頭 + 雙手下垂 + 雙肩向前併攏 + 難過表情 (Gao B11；低頭替代軀幹前彎) */
+    val sentimentNegative: Scenario = Scenario(
+        id = "butler_sentiment_negative",
+        title = "S3. 負面回覆・低頭垂手收肩 (Negative)",
+        category = ScenarioCategory.BUTLER,
+        description = "低頭、雙臂下垂、雙肩向前併攏並顯示難過表情，停留後回位；頸部回位有 4~5 秒兩段式延遲",
+        badge = "低頭・垂手・收肩・難過臉",
+        affectiveState = "Negative Valence, Low Arousal (悲傷／同理)",
+        theoryPaper = "Gao 2024 B11 (Sadness 66.67%)；Dael 2012 C10 (Sadness 50%)；低頭為軀幹前彎之替代",
+        face = SAD_FACE,
+        steps = listOf(
+            ScenarioStep(
+                name = "低頭・垂手・雙肩前收・難過臉",
+                jointTargets = listOf(
+                    JointTarget(Motor.NECK_Y, SAD_HEAD, 40f),            // ⚠️ 低頭方向未實測
+                    JointTarget(Motor.R_SHOULDER_Y, 0f, SAD_SPEED),
+                    JointTarget(Motor.L_SHOULDER_Y, 0f, SAD_SPEED),
+                    JointTarget(Motor.R_ELBOW, 0f, SAD_SPEED),
+                    JointTarget(Motor.L_ELBOW, 0f, SAD_SPEED),
+                    JointTarget(Motor.R_SHOULDER_Z, SAD_SHOULDER, SAD_SPEED),
+                    JointTarget(Motor.L_SHOULDER_Z, SAD_SHOULDER, SAD_SPEED)
+                ),
+                ledPattern = LedPattern.SOFT_WHITE,
+                timeoutMs = 2000L
+            ),
+            ScenarioStep("停留", ledPattern = LedPattern.SOFT_WHITE, timeoutMs = 2000L),
+            ScenarioStep(
+                name = "回位",
+                jointTargets = listOf(
+                    JointTarget(Motor.NECK_Y, 0f, 40f),
+                    JointTarget(Motor.R_SHOULDER_Z, 0f, SAD_SPEED),
+                    JointTarget(Motor.L_SHOULDER_Z, 0f, SAD_SPEED)
+                ),
+                ledPattern = LedPattern.SOFT_WHITE,
+                // 雙肩 120 / 60 = 2 秒回位 (最慢的關節)；原本 7 秒等頸部兩段式回位，
+                // 造成身體停了表情還在。改成跟可見動作一致，表情同時恢復。
+                timeoutMs = 2200L
+            )
+        )
+    )
+
     val allScenarios: List<Scenario> = listOf(
         // ==========================================
         // 🎩 管家日常聊天與伴侶劇本 (Butler Companion Suite - 8 套)
@@ -362,6 +532,17 @@ object ScenarioRepository {
                 )
             )
         ),
+
+        // ==========================================
+        // 💬 管家回覆情緒動作 (Sentiment Suite - 3 套)
+        // 對應 SafeCall 後端 x-sentiment-label: positive / neutral / negative
+        // 設計依據：Dael et al. (2012) Emotion 12(5); Gao et al. (2024) Biomimetics 9(11)
+        // 限制：無台詞、無音效、無底盤 (管家語音由 SafeCall 後端 MP3 播放)；
+        //       關節角度僅使用 JointSafety 白名單內的已測區間
+        // ==========================================
+        sentimentPositive,
+        sentimentNeutral,
+        sentimentNegative,
 
         // ==========================================
         // 🚨 詐騙提醒與多層級實體阻斷劇本 (Anti-Fraud Suite - 8 套)

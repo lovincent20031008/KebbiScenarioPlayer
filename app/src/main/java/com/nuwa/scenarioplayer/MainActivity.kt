@@ -19,6 +19,8 @@ import com.nuwa.scenarioplayer.engine.ScenarioEngine
 import com.nuwa.scenarioplayer.model.Scenario
 import com.nuwa.scenarioplayer.model.ScenarioCategory
 import com.nuwa.scenarioplayer.model.ScenarioRepository
+import com.nuwarobotics.service.facecontrol.UnityFaceManager
+import com.nuwarobotics.service.facecontrol.utils.ServiceConnectListener
 import com.nuwa.scenarioplayer.model.ScenarioStep
 import com.nuwa.scenarioplayer.server.ScenarioHttpServer
 import com.nuwarobotics.service.IClientId
@@ -167,6 +169,17 @@ class MainActivity : AppCompatActivity() {
             override fun onDropSensorEvent(p0: Int) {}
             override fun onMotorErrorEvent(p0: Int, p1: Int) {}
         })
+
+        // 臉部控制服務：UnityFaceManager 必須先 init 才能 playMotion 換表情
+        try {
+            UnityFaceManager.getInstance().init(applicationContext, packageName, object : ServiceConnectListener {
+                override fun onConnectChanged(name: android.content.ComponentName?, connected: Boolean) {
+                    Log.i(TAG, "UnityFace service connected=$connected")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "UnityFaceManager init failed", e)
+        }
 
         if (robot.isKiWiServiceReady()) {
             robotReady = true
