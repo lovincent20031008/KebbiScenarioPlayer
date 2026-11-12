@@ -82,11 +82,43 @@ object JointSafety {
         10 to -120f..0f
     )
 
+    /**
+     * 浮動是「相對於內建動作姿勢」的小擺動，基準角度來自內建動作、不一定在上面的白名單內，
+     * 因此改用：幅度上限 + 速度上限 + SDK 文件範圍 (MOTOR_MAPPING.md) 做檢查。
+     */
+    const val MAX_WIGGLE_AMPLITUDE = 15f   // v2：10 仍不明顯 (指令值大於實際位移)；頭部左右 ±15 已實測
+    const val MAX_WIGGLE_SPEED = 40f      // 低於 B 版 safe 模式 55
+    val sdkRanges: Map<Int, ClosedFloatingPointRange<Float>> = mapOf(
+        1 to -20f..20f, 2 to -40f..40f, 3 to -85f..5f, 4 to -200f..70f, 5 to -3f..100f,
+        6 to -80f..0f, 7 to -85f..5f, 8 to -200f..70f, 9 to -3f..100f, 10 to -80f..0f
+    )
+
+    fun isWiggleAllowed(motorId: Int, base: Float, target: Float, speed: Float): Boolean {
+        val range = sdkRanges[motorId] ?: return false
+        return !base.isNaN() && kotlin.math.abs(target - base) <= MAX_WIGGLE_AMPLITUDE &&
+            target in range && speed > 0f && speed <= MAX_WIGGLE_SPEED
+    }
+
     fun isAllowed(target: JointTarget): Boolean {
         val range = testedRanges[target.motorId] ?: return false
         return target.degree in range && target.speed > 0f && target.speed <= MAX_SPEED
     }
 }
+
+/**
+ * 維持姿勢時的不規則自然浮動 (每個關節各自獨立)：
+ * 以暫停當下讀到的角度為基準，每次隨機挑一個 [minOffset, maxOffset] 內的新目標、
+ * 用 speed 移過去，再隨機停留 minDwellMs~maxDwellMs，然後重複。
+ * 例：頭左右 (-8, 8)；點頭只往下 (0, 4)。安全限制見 JointSafety。
+ */
+data class Wiggle(
+    val motorId: Int,
+    val minOffset: Float,
+    val maxOffset: Float,
+    val minDwellMs: Long,
+    val maxDwellMs: Long,
+    val speed: Float
+)
 
 data class ScenarioStep(
     val name: String,
@@ -98,7 +130,18 @@ data class ScenarioStep(
     val ttsText: String? = null,
     val ttsSpeed: String = "100",
     val ttsPitch: String = "100",
-    val timeoutMs: Long = 6000L
+    val timeoutMs: Long = 6000L,
+    /** 播放內建動作時是否顯示動作附帶的臉部影片 (舊劇本維持 true) */
+    val motionWithFace: Boolean = true,
+    /**
+     * 內建動作播到 holdAtMs 毫秒時暫停 (motionPause)，維持該姿勢，
+     * 直到外部呼叫 next() 才繼續播完 (motionResume，自然回到預設姿勢) 並進下一步。
+     * 例：思考維持到回覆來、聆聽維持到長輩說完。此時 timeoutMs 是最長維持時間 (安全上限)。
+     * null = 一般播放。
+     */
+    val holdAtMs: Long? = null,
+    /** 維持姿勢期間的小幅浮動 (以暫停當下的關節角度為中心來回擺動) */
+    val holdWiggle: List<Wiggle> = emptyList()
 )
 
 /**

@@ -304,6 +304,101 @@ object ScenarioRepository {
         )
     )
 
+    // ==========================================
+    // 🧠 管家互動時機動作 (以 Nuwa 內建動作為基礎，方式 A：只加維持姿勢/燈光/表情/串接，不改動作本身)
+    // 內建動作長度以 /motion/info (motionPrepare) 實測
+    // ==========================================
+    private const val MAX_LOOP_MS = 30_000L   // 維持姿勢安全上限：沒有收到 next() 時最多維持 30 秒
+    // 暫停點 (毫秒)：2026-11-12 以 /motion/trace 實測關節軌跡
+    // Tinythink：0.3~1.0s 抬手過渡、1.1~1.5s 完整思考姿勢 (低頭、雙手到下巴)、1.6s 起回立正
+    // Listen：0.4~1.0s 過渡、1.1~1.5s 完整聆聽姿勢 (低頭、頭側轉、右手到耳邊)、1.6s 起回立正
+    private const val THINK_HOLD_AT_MS = 1450L
+    private const val LISTEN_HOLD_AT_MS = 1450L
+
+    /** 等回覆：Tinythink (2.0s) 重播到回覆到達，紫色脈衝燈 */
+    val butlerThinkLoop: Scenario = Scenario(
+        id = "butler_think_loop",
+        title = "T1. 等待回覆・思考維持 (Thinking Hold)",
+        category = ScenarioCategory.BUTLER,
+        description = "內建 888_ML_Tinythink_25 播到思考姿勢就停住，回覆到達 (/scenario/next) 後播完回到立正；紫色脈衝燈",
+        badge = "思考姿勢維持・紫光",
+        affectiveState = "Neutral, Low Arousal (處理中)",
+        theoryPaper = "Nuwa 內建動作；方式 A 組合",
+        steps = listOf(
+            ScenarioStep(
+                name = "思考 (維持到回覆到達)",
+                motionName = "888_ML_Tinythink_25",
+                motionWithFace = false,
+                holdAtMs = THINK_HOLD_AT_MS,
+                // 思考：頭不規則左右轉 (像在琢磨)、托腮的左手微調、右手肘偶爾動
+                holdWiggle = listOf(
+                    // 基準 (trace)：頭左右 ≈0、左大臂 ≈-104、右手肘 ≈-42
+                    Wiggle(Motor.NECK_Z, -15f, 15f, 700L, 1800L, speed = 35f),
+                    Wiggle(Motor.L_SHOULDER_Y, -15f, 15f, 900L, 2000L, speed = 30f),
+                    Wiggle(Motor.R_ELBOW, -12f, 12f, 1000L, 2200L, speed = 30f)
+                ),
+                ledPattern = LedPattern.PURPLE_PULSE,
+                timeoutMs = MAX_LOOP_MS
+            )
+        )
+    )
+
+    /** 長輩說話時：Listen (2.0s) 重播到說完，接點頭 Nodhead (1.2s) 表示聽到了 */
+    val butlerListenNod: Scenario = Scenario(
+        id = "butler_listen_nod",
+        title = "T2. 長輩說話・聆聽維持後點頭 (Listening Hold + Nod)",
+        category = ScenarioCategory.BUTLER,
+        description = "內建 666_DA_Listen 播到聆聽姿勢就停住，長輩說完 (/scenario/next) 後播完並接 666_BA_Nodhead 點頭；青藍燈",
+        badge = "聆聽姿勢維持・點頭",
+        affectiveState = "Neutral, Low Arousal (專注聆聽)",
+        theoryPaper = "Nuwa 內建動作；方式 A 組合",
+        steps = listOf(
+            ScenarioStep(
+                name = "聆聽 (維持到長輩說完)",
+                motionName = "666_DA_Listen",
+                motionWithFace = false,
+                holdAtMs = LISTEN_HOLD_AT_MS,
+                // 聆聽：頭往說話者方向微調、耳邊的右手微動、偶爾點頭
+                holdWiggle = listOf(
+                    // 基準 (trace)：頭左右 ≈12.7、右大臂 ≈-86、頭俯仰 ≈15.6 (SDK 上限 20，所以點頭往上抬 8、往下只到 4)
+                    Wiggle(Motor.NECK_Z, -12f, 12f, 1200L, 2500L, speed = 30f),
+                    Wiggle(Motor.R_SHOULDER_Y, -15f, 15f, 1000L, 2200L, speed = 30f),
+                    Wiggle(Motor.NECK_Y, -8f, 4f, 1500L, 3000L, speed = 30f)
+                ),
+                ledPattern = LedPattern.CYAN_FLOW,
+                timeoutMs = MAX_LOOP_MS
+            ),
+            ScenarioStep(
+                name = "點頭 (我聽到了)",
+                motionName = "666_BA_Nodhead",
+                motionWithFace = false,
+                ledPattern = LedPattern.CYAN_FLOW,
+                timeoutMs = 2000L   // 動作 1.2 秒；完成回呼會提早進下一步
+            )
+        )
+    )
+
+    /** 道別：J1_Bye (2.5s) + 開心表情 (與 Nuwa 的 J1_Bye 表情包同一個動畫) */
+    val butlerByeHappy: Scenario = Scenario(
+        id = "butler_bye_happy",
+        title = "T3. 道別・開心揮手 (Farewell)",
+        category = ScenarioCategory.BUTLER,
+        description = "內建 000_J1_Bye (2.5 秒) 揮手道別，配開心表情 007_J3_Happy61；暖金燈",
+        badge = "揮手道別・開心臉",
+        affectiveState = "Positive, Moderate Arousal (溫暖道別)",
+        theoryPaper = "Nuwa 內建動作；表情與 Nuwa J1_Bye 表情包相同",
+        face = HAPPY_FACE,
+        steps = listOf(
+            ScenarioStep(
+                name = "揮手道別",
+                motionName = "000_J1_Bye",
+                motionWithFace = false,
+                ledPattern = LedPattern.BREATH_GOLD,
+                timeoutMs = 3500L   // 動作 2.5 秒；完成回呼會提早結束
+            )
+        )
+    )
+
     val allScenarios: List<Scenario> = listOf(
         // ==========================================
         // 🎩 管家日常聊天與伴侶劇本 (Butler Companion Suite - 8 套)
@@ -543,6 +638,9 @@ object ScenarioRepository {
         sentimentPositive,
         sentimentNeutral,
         sentimentNegative,
+        butlerThinkLoop,
+        butlerListenNod,
+        butlerByeHappy,
 
         // ==========================================
         // 🚨 詐騙提醒與多層級實體阻斷劇本 (Anti-Fraud Suite - 8 套)
